@@ -4,7 +4,7 @@
 
 **"Build Your Profile. Discover Opportunities. Get Hired."**
 
-A complete, modern and responsive **college placement management system** where students build a career profile, generate an AI-assisted resume, get explainable job matches and apply online, while the placement cell and admin manage companies, jobs, interviews, placements and analytics from one dashboard. Built with Flask, SQLite, Bootstrap 5, scikit-learn and Chart.js for **JAYHIND College of Engineering** (Kuran, Narayangaon, Pune).
+A complete, modern and responsive **college placement management system** where students build a career profile, generate an AI-assisted resume, get explainable job matches and apply online, while the placement cell and admin manage companies, jobs, interviews, placements and analytics from one dashboard. Built with Flask, SQLite, Bootstrap 5, scikit-learn and Chart.js for **JAYHIND College of Engineering**.
 
 <div align="center">
 
@@ -61,8 +61,6 @@ To replace scattered spreadsheets, WhatsApp groups and paper forms with one tran
 ---
 
 ## 📸 Project Screenshots
-
-> 📌 **How to add your screenshots:** every image below already exists as a placeholder in `docs/screenshots/`. Run the project, take a screenshot of each page, and **replace the file with the same name** (for example save your home page screenshot as `docs/screenshots/01-landing-hero.png`). The README then updates automatically on GitHub. Recommended size: 1280 × 720 PNG.
 
 ### 🌐 Public Website
 
