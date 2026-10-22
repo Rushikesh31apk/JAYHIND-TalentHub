@@ -193,4 +193,5 @@ Email/SMS alerts, Google/Microsoft calendar sync for interviews, company self-se
 * The brief says "JAYHIND College"; the supplied link is Jaihind College of Engineering, so the institution name, address, phone, courses and departments follow <https://jaihind.edu.in/jcoe/>. Change `COLLEGE_NAME`, `COURSES` in `config.py` and the departments in `seed.py` for another institution.
 * Match scores are computed on request. This is fast for hundreds of jobs; for thousands, cache scores per student/job.
 #   J A Y H I N D - T a l e n t H u b  
+ #   J A Y H I N D - T a l e n t H u b  
  
