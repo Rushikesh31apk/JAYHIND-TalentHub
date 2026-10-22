@@ -1,4 +1,4 @@
-<div align="center"> # 🎓 JAYHIND TalentHub ✨ </div>
+# 🎓 JAYHIND TalentHub ✨
 
 ### AI-Powered Student Career, Placement & Recruitment Web Application
 
