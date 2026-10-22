@@ -89,42 +89,42 @@ To replace scattered spreadsheets, WhatsApp groups and paper forms with one tran
 |---|---|
 | **Student Dashboard (stats, charts, recommended jobs)** | ![Student Dashboard (stats, charts, recommended jobs)](project_images/10.png) |
 | **Profile Builder (8 sections + completion score)** | ![Profile Builder (8 sections + completion score)](project_images/11.png) |
-| **AI Resume Generator Page** | ![AI Resume Generator Page](project_images/12.png) |
+| **AI Resume Generator Page** | ![AI Resume Generator Page](project_images/14.png) |
 | **ATS Resume Preview with ATS Score** | ![ATS Resume Preview with ATS Score](project_images/13.png) |
-| **Find Jobs with AI Match Scores** | ![Find Jobs with AI Match Scores](project_images/14.png) |
-| **Job Details with Eligibility Check** | ![Job Details with Eligibility Check](project_images/15.png) |
-| **My Applications with Timeline** | ![My Applications with Timeline](project_images/16.png) |
-| **Interviews Page** | ![Interviews Page](project_images/17.png) |
-| **Notifications Page** | ![Notifications Page](project_images/18.png) |
+| **Find Jobs with AI Match Scores** | ![Find Jobs with AI Match Scores](project_images/15.png) |
+| **Job Details with Eligibility Check** | ![Job Details with Eligibility Check](project_images/16.png) |
+| **My Applications with Timeline** | ![My Applications with Timeline](project_images/17.png) |
+| **Interviews Page** | ![Interviews Page](project_images/18.png) |
+| **Notifications Page** | ![Notifications Page](project_images/19.png) |
 
 ### 🏫 College / Placement Cell
 
 | Page | Preview |
 |---|---|
-| **Placement Dashboard (analytics charts)** | ![Placement Dashboard (analytics charts)](project_images/19.png) |
-| **Student Search and Filters** | ![Student Search and Filters](project_images/20.png) |
-| **Student Profile with Verify / Reject** | ![Student Profile with Verify / Reject](project_images/21.png) |
-| **Company Management** | ![Company Management](project_images/22.png) |
-| **Post a Job (eligibility rules)** | ![Post a Job (eligibility rules)](project_images/23.png) |
-| **Application Management with Bulk Actions** | ![Application Management with Bulk Actions](project_images/24.png) |
-| **Interview Scheduling** | ![Interview Scheduling](project_images/25.png) |
-| **Placement Records and Statistics** | ![Placement Records and Statistics](project_images/26.png) |
+| **Placement Dashboard (analytics charts)** | ![Placement Dashboard (analytics charts)](project_images/20.png) |
+| **Student Search and Filters** | ![Student Search and Filters](project_images/21.png) |
+| **Student Profile with Verify / Reject** | ![Student Profile with Verify / Reject](project_images/22.png) |
+| **Company Management** | ![Company Management](project_images/23.png) |
+| **Post a Job (eligibility rules)** | ![Post a Job (eligibility rules)](project_images/24.png) |
+| **Application Management with Bulk Actions** | ![Application Management with Bulk Actions](project_images/25.png) |
+| **Interview Scheduling** | ![Interview Scheduling](project_images/26.png) |
+| **Placement Records and Statistics** | ![Placement Records and Statistics](project_images/27.png) |
 
 ### 🛡️ Admin Panel
 
 | Page | Preview |
 |---|---|
-| **Admin Dashboard** | ![Admin Dashboard](project_images/27.png) |
-| **User Management** | ![User Management](project_images/28.png) |
-| **Departments and Skills** | ![Departments and Skills](project_images/29.png) |
-| **Settings (match score weights)** | ![Settings (match score weights)](project_images/30.png) |
-| **Audit Log** | ![Audit Log](project_images/31.png) |
+| **Admin Dashboard** | ![Admin Dashboard](project_images/28.png) |
+| **User Management** | ![User Management](project_images/29.png) |
+| **Departments and Skills** | ![Departments and Skills](project_images/30.png) |
+| **Settings (match score weights)** | ![Settings (match score weights)](project_images/31.png) |
+| **Audit Log** | ![Audit Log](project_images/32.png) |
 
 ### 📊 Reports
 
 | Page | Preview |
 |---|---|
-| **Reports Page (PDF / Excel / CSV)** | ![Reports Page (PDF / Excel / CSV)](project_images/32.png) |
+| **Reports Page (PDF / Excel / CSV)** | ![Reports Page (PDF / Excel / CSV)](project_images/33.png) |
 
 ---
 
