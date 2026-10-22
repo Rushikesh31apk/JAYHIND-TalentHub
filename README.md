@@ -68,67 +68,63 @@ To replace scattered spreadsheets, WhatsApp groups and paper forms with one tran
 
 | Page | Preview |
 |---|---|
-| **Home / Hero Section** | ![Home / Hero Section](docs/screenshots/01-landing-hero.png) |
-| **Features Section** | ![Features Section](docs/screenshots/02-landing-features.png) |
-| **How It Works (Students, Placement Cell, Companies)** | ![How It Works (Students, Placement Cell, Companies)](docs/screenshots/03-landing-roles.png) |
-| **About the College Section** | ![About the College Section](docs/screenshots/04-landing-about.png) |
-| **FAQ and Call-to-Action Section** | ![FAQ and Call-to-Action Section](docs/screenshots/05-landing-faq-cta.png) |
-| **Public Jobs Page** | ![Public Jobs Page](docs/screenshots/06-public-jobs.png) |
-| **Contact Page** | ![Contact Page](docs/screenshots/07-contact.png) |
+| **Home / Hero Section** | ![Home / Hero Section](project_images/1.png) |
+| **Features Section** | ![Features Section](project_images/2.png) |
+| **How It Works (Students, Placement Cell, Companies)** | ![How It Works (Students, Placement Cell, Companies)](project_images/3.png) |
+| **About the College Section** | ![About the College Section](project_images/4.png) |
+| **FAQ and Call-to-Action Section** | ![FAQ and Call-to-Action Section](project_images/5.png) |
+| **Public Jobs Page** | ![Public Jobs Page](project_images/6.png) |
+| **Contact Page** | ![Contact Page](project_images/7.png) |
 
 ### 🔐 Authentication
 
 | Page | Preview |
 |---|---|
-| **Login Page (Student / Placement Cell / Admin tabs)** | ![Login Page (Student / Placement Cell / Admin tabs)](docs/screenshots/08-login.png) |
-| **Student Registration Page** | ![Student Registration Page](docs/screenshots/09-register.png) |
+| **Login Page (Student / Placement Cell / Admin tabs)** | ![Login Page (Student / Placement Cell / Admin tabs)](project_images/8.png) |
+| **Student Registration Page** | ![Student Registration Page](project_images/9.png) |
 
 ### 🎓 Student Portal
 
 | Page | Preview |
 |---|---|
-| **Student Dashboard (stats, charts, recommended jobs)** | ![Student Dashboard (stats, charts, recommended jobs)](docs/screenshots/10-student-dashboard.png) |
-| **Profile Builder (8 sections + completion score)** | ![Profile Builder (8 sections + completion score)](docs/screenshots/11-student-profile.png) |
-| **Skills Section (auto-normalised skills)** | ![Skills Section (auto-normalised skills)](docs/screenshots/12-student-skills.png) |
-| **AI Resume Generator Page** | ![AI Resume Generator Page](docs/screenshots/13-ai-resume-generate.png) |
-| **ATS Resume Preview with ATS Score** | ![ATS Resume Preview with ATS Score](docs/screenshots/14-ai-resume-preview.png) |
-| **Downloaded Resume PDF** | ![Downloaded Resume PDF](docs/screenshots/15-resume-pdf.png) |
-| **Find Jobs with AI Match Scores** | ![Find Jobs with AI Match Scores](docs/screenshots/16-find-jobs.png) |
-| **Why This Match? (score breakdown dialog)** | ![Why This Match? (score breakdown dialog)](docs/screenshots/17-job-match-modal.png) |
-| **Job Details with Eligibility Check** | ![Job Details with Eligibility Check](docs/screenshots/18-job-detail-eligibility.png) |
-| **My Applications with Timeline** | ![My Applications with Timeline](docs/screenshots/19-my-applications.png) |
-| **Interviews Page** | ![Interviews Page](docs/screenshots/20-student-interviews.png) |
-| **Notifications Page** | ![Notifications Page](docs/screenshots/21-notifications.png) |
+| **Student Dashboard (stats, charts, recommended jobs)** | ![Student Dashboard (stats, charts, recommended jobs)](project_images/10.png) |
+| **Profile Builder (8 sections + completion score)** | ![Profile Builder (8 sections + completion score)](project_images/11.png) |
+| **AI Resume Generator Page** | ![AI Resume Generator Page](project_images/12.png) |
+| **ATS Resume Preview with ATS Score** | ![ATS Resume Preview with ATS Score](project_images/13.png) |
+| **Find Jobs with AI Match Scores** | ![Find Jobs with AI Match Scores](project_images/14.png) |
+| **Job Details with Eligibility Check** | ![Job Details with Eligibility Check](project_images/15.png) |
+| **My Applications with Timeline** | ![My Applications with Timeline](project_images/16.png) |
+| **Interviews Page** | ![Interviews Page](project_images/17.png) |
+| **Notifications Page** | ![Notifications Page](project_images/18.png) |
 
 ### 🏫 College / Placement Cell
 
 | Page | Preview |
 |---|---|
-| **Placement Dashboard (analytics charts)** | ![Placement Dashboard (analytics charts)](docs/screenshots/22-college-dashboard.png) |
-| **Student Search and Filters** | ![Student Search and Filters](docs/screenshots/23-college-students.png) |
-| **Student Profile with Verify / Reject** | ![Student Profile with Verify / Reject](docs/screenshots/24-college-student-detail.png) |
-| **Company Management** | ![Company Management](docs/screenshots/25-college-companies.png) |
-| **Post a Job (eligibility rules)** | ![Post a Job (eligibility rules)](docs/screenshots/26-college-post-job.png) |
-| **Application Management with Bulk Actions** | ![Application Management with Bulk Actions](docs/screenshots/27-college-applications.png) |
-| **Interview Scheduling** | ![Interview Scheduling](docs/screenshots/28-college-interviews.png) |
-| **Placement Records and Statistics** | ![Placement Records and Statistics](docs/screenshots/29-college-placements.png) |
+| **Placement Dashboard (analytics charts)** | ![Placement Dashboard (analytics charts)](project_images/19.png) |
+| **Student Search and Filters** | ![Student Search and Filters](project_images/20.png) |
+| **Student Profile with Verify / Reject** | ![Student Profile with Verify / Reject](project_images/21.png) |
+| **Company Management** | ![Company Management](project_images/22.png) |
+| **Post a Job (eligibility rules)** | ![Post a Job (eligibility rules)](project_images/23.png) |
+| **Application Management with Bulk Actions** | ![Application Management with Bulk Actions](project_images/24.png) |
+| **Interview Scheduling** | ![Interview Scheduling](project_images/25.png) |
+| **Placement Records and Statistics** | ![Placement Records and Statistics](project_images/26.png) |
 
 ### 🛡️ Admin Panel
 
 | Page | Preview |
 |---|---|
-| **Admin Dashboard** | ![Admin Dashboard](docs/screenshots/30-admin-dashboard.png) |
-| **User Management** | ![User Management](docs/screenshots/31-admin-users.png) |
-| **Departments and Skills** | ![Departments and Skills](docs/screenshots/32-admin-catalog.png) |
-| **Settings (match score weights)** | ![Settings (match score weights)](docs/screenshots/33-admin-settings.png) |
-| **Audit Log** | ![Audit Log](docs/screenshots/34-admin-audit-log.png) |
+| **Admin Dashboard** | ![Admin Dashboard](project_images/27.png) |
+| **User Management** | ![User Management](project_images/28.png) |
+| **Departments and Skills** | ![Departments and Skills](project_images/29.png) |
+| **Settings (match score weights)** | ![Settings (match score weights)](project_images/30.png) |
+| **Audit Log** | ![Audit Log](project_images/31.png) |
 
 ### 📊 Reports
 
 | Page | Preview |
 |---|---|
-| **Reports Page (PDF / Excel / CSV)** | ![Reports Page (PDF / Excel / CSV)](docs/screenshots/35-reports-page.png) |
-| **Sample PDF Report** | ![Sample PDF Report](docs/screenshots/36-report-pdf-sample.png) |
+| **Reports Page (PDF / Excel / CSV)** | ![Reports Page (PDF / Excel / CSV)](project_images/32.png) |
 
 ---
 

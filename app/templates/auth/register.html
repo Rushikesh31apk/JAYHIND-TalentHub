@@ -3,7 +3,8 @@
 {% block title %}Student registration | JAYHIND TalentHub{% endblock %}
 {% block content %}
 <section class="band pt-4"><div class="container"><div class="row g-4 align-items-start">
-  <div class="col-lg-4 d-none d-lg-block"><div class="sticky-side">{{ photo('graduation', 'Graduates celebrating', width=800, cls='mb-3', ) }}
+  <div class="col-lg-4 d-none d-lg-block"><div class="sticky-side"><img src="{{ url_for('static', filename='images/register.jpg') }}" alt="Graduates celebrating"
+          class="img-fluid w-100 rounded-4" style="aspect-ratio: 4 / 3; object-fit: cover;" loading="lazy">
     <style>.sticky-side .photo{height:320px}</style><div class="kicker">Student registration</div><h2>Start your placement journey</h2><p class="text-muted">Use your college roll number. You will complete the full profile after signing in.</p></div></div>
   <div class="col-lg-8"><h2 class="d-lg-none">Create your student account</h2>
   <div class="card"><div class="card-body p-4"><form method="post" novalidate>{{ form.hidden_tag() }}
