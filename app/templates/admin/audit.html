@@ -1,0 +1,9 @@
+{% extends 'base_app.html' %}
+{% from '_macros.html' import pagination %}
+{% block title %}Audit Log{% endblock %}
+{% block content %}
+<form class="d-flex gap-2 mb-3" method="get"><input class="form-control" name="q" value="{{ q }}" placeholder="Filter by action, user or details" aria-label="Filter"><button class="btn btn-soft">Filter</button></form>
+<div class="card"><div class="table-responsive"><table class="table table-sm table-hover mb-0"><thead><tr><th>Time</th><th>User</th><th>Action</th><th>Entity</th><th>Details</th><th>IP</th></tr></thead><tbody>
+  {% for l in page.items %}<tr><td class="small text-nowrap">{{ l.created_at|dt }}</td><td class="small">{{ l.user.email if l.user else 'system' }}</td><td><b class="small">{{ l.action }}</b></td><td class="small">{{ l.entity or '' }} {{ l.entity_id or '' }}</td><td class="small text-muted">{{ l.details }}</td><td class="small text-muted">{{ l.ip_address }}</td></tr>{% else %}<tr><td colspan="6" class="text-center text-muted py-4">No log entries.</td></tr>{% endfor %}</tbody></table></div></div>
+{{ pagination(page) }}
+{% endblock %}

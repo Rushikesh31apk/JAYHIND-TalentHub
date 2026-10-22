@@ -1,0 +1,17 @@
+{% extends 'base_app.html' %}
+{% from '_macros.html' import field, csrf %}
+{% block title %}Departments &amp; Skills{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-5"><div class="card"><div class="card-header">Departments</div><div class="card-body">
+    <form method="post" class="row g-2 mb-3" novalidate>{{ dept_form.hidden_tag() }}<input type="hidden" name="which" value="department">
+      <div class="col-7">{{ field(dept_form.name) }}</div><div class="col-5">{{ field(dept_form.code) }}</div><div class="col-12"><button class="btn btn-primary btn-sm">Add department</button></div></form>
+    {% for d in departments %}<div class="d-flex justify-content-between align-items-center border-bottom py-2"><div><b>{{ d.name }}</b> <span class="text-muted small">{{ d.code }}</span></div>
+      <form method="post" action="{{ url_for('admin.department_toggle', dept_id=d.id) }}">{{ csrf() }}<button class="btn btn-sm {{ 'btn-outline-secondary' if d.active else 'btn-outline-success' }}">{{ 'Deactivate' if d.active else 'Activate' }}</button></form></div>{% endfor %}</div></div></div>
+  <div class="col-lg-7"><div class="card"><div class="card-header">Skills master list</div><div class="card-body">
+    <form method="post" class="row g-2 mb-3" novalidate>{{ skill_form.hidden_tag() }}<input type="hidden" name="which" value="skill">
+      <div class="col-md-5">{{ field(skill_form.name) }}</div><div class="col-md-4">{{ field(skill_form.category) }}</div><div class="col-md-3 d-flex align-items-end"><button class="btn btn-primary btn-sm w-100">Add skill</button></div></form>
+    <div style="max-height:420px;overflow:auto"><table class="table table-sm mb-0"><thead><tr><th>Skill</th><th>Category</th><th>Students</th><th></th></tr></thead><tbody>
+      {% for s, n in skills %}<tr><td>{{ s.name }}</td><td class="small text-muted">{{ s.category }}</td><td>{{ n }}</td><td class="text-end"><form method="post" action="{{ url_for('admin.skill_delete', skill_id=s.id) }}" data-confirm="Delete {{ s.name }}?">{{ csrf() }}<button class="btn btn-sm btn-outline-danger" aria-label="Delete"><i class="bi bi-trash"></i></button></form></td></tr>{% endfor %}</tbody></table></div></div></div></div>
+</div>
+{% endblock %}

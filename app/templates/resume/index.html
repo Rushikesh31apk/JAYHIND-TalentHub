@@ -1,0 +1,39 @@
+{% extends 'base_app.html' %}
+{% from '_macros.html' import field, csrf, empty, badge %}
+{% block title %}AI Resume{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-7 d-flex flex-column gap-3">
+    <div class="card panel-green"><div class="card-body p-4">
+      <h3 class="text-white">AI resume generator</h3>
+      <p class="soft" class="mb-3">Builds a professional summary, objective and polished project lines from your profile, then scores the result for ATS screening. No external AI service needed.</p>
+      <form method="post" action="{{ url_for('resume.generate') }}">{{ csrf() }}<button class="btn btn-accent btn-lg" data-loading="Generating your resume...">{{ 'Regenerate AI resume' if resume else 'Generate AI resume' }}</button></form>
+      <div class="small mt-2 soft">Profile completion: {{ student.completion }}%. A fuller profile gives a stronger resume.</div>
+    </div></div>
+
+    {% if resume and content %}
+    <div class="card"><div class="card-header d-flex justify-content-between align-items-center">Your latest resume <span class="small fw-normal text-muted">v{{ resume.version }} &middot; {{ resume.created_at|dt }}</span></div>
+      <div class="card-body"><div class="d-flex flex-wrap gap-2 mb-3">
+        <a class="btn btn-primary btn-sm" href="{{ url_for('resume.preview') }}"><i class="bi bi-eye me-1"></i>Preview</a>
+        <a class="btn btn-accent btn-sm" href="{{ url_for('resume.download') }}"><i class="bi bi-download me-1"></i>Download resume PDF</a>
+        <a class="btn btn-soft btn-sm" href="{{ url_for('resume.edit') }}"><i class="bi bi-pencil me-1"></i>Edit</a></div>
+        <h6>Project descriptions improved by the AI</h6>
+        {% for p in content.projects %}<div class="mb-3 small"><b>{{ p.name }}</b><div class="text-muted"><i class="bi bi-x-circle text-danger"></i> Before: {{ p.original_description }}</div><div><i class="bi bi-check-circle text-success"></i> After: {{ p.description }}</div></div>
+        {% else %}<div class="text-muted small">Add projects to your profile to see improved descriptions.</div>{% endfor %}</div></div>
+    {% elif resume and resume.source == 'uploaded' %}
+    <div class="card"><div class="card-body"><b>Uploaded resume v{{ resume.version }}</b> is your latest resume. <a href="{{ url_for('resume.download_any', resume_id=resume.id) }}">Download</a></div></div>
+    {% else %}<div class="card">{% call empty('bi-file-earmark-person', 'No resume yet', 'Generate one from your profile in a few seconds.') %}{% endcall %}</div>{% endif %}
+
+    <div class="card"><div class="card-header">Upload your own resume (optional)</div><div class="card-body">
+      <form method="post" action="{{ url_for('resume.upload') }}" enctype="multipart/form-data" class="row g-2 align-items-end">{{ upload_form.hidden_tag() }}
+        <div class="col-md-8">{{ field(upload_form.file) }}</div><div class="col-md-4"><button class="btn btn-soft w-100" data-loading="Uploading...">Upload PDF</button></div></form></div></div>
+  </div>
+  <div class="col-lg-5 d-flex flex-column gap-3">
+    {% include 'resume/_score.html' %}
+    {% if student.resumes %}<div class="card"><div class="card-header">Version history</div><div class="list-group list-group-flush">
+      {% for r in student.resumes %}<div class="list-group-item d-flex justify-content-between align-items-center"><div><b>v{{ r.version }}</b> {{ 'AI generated' if r.source == 'generated' else 'Uploaded' }} {% if r.is_latest %}<span class="badge badge-soft-success">Latest</span>{% endif %}<div class="small text-muted">{{ r.created_at|dt }}{% if r.ats_score %} &middot; ATS {{ r.ats_score|round|int }}{% endif %}</div></div>
+        <div class="text-nowrap"><a class="btn btn-soft btn-sm" href="{{ url_for('resume.download_any', resume_id=r.id) }}" aria-label="Download"><i class="bi bi-download"></i></a>
+          <form class="d-inline" method="post" action="{{ url_for('resume.delete', resume_id=r.id) }}" data-confirm="Delete this resume version?">{{ csrf() }}<button class="btn btn-outline-danger btn-sm" aria-label="Delete"><i class="bi bi-trash"></i></button></form></div></div>{% endfor %}</div></div>{% endif %}
+  </div>
+</div>
+{% endblock %}

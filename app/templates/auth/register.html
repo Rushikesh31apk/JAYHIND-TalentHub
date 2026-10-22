@@ -1,0 +1,19 @@
+{% extends 'base_public.html' %}
+{% from '_macros.html' import field, photo %}
+{% block title %}Student registration | JAYHIND TalentHub{% endblock %}
+{% block content %}
+<section class="band pt-4"><div class="container"><div class="row g-4 align-items-start">
+  <div class="col-lg-4 d-none d-lg-block"><div class="sticky-side">{{ photo('graduation', 'Graduates celebrating', width=800, cls='mb-3', ) }}
+    <style>.sticky-side .photo{height:320px}</style><div class="kicker">Student registration</div><h2>Start your placement journey</h2><p class="text-muted">Use your college roll number. You will complete the full profile after signing in.</p></div></div>
+  <div class="col-lg-8"><h2 class="d-lg-none">Create your student account</h2>
+  <div class="card"><div class="card-body p-4"><form method="post" novalidate>{{ form.hidden_tag() }}
+    <div class="row g-3">
+      {{ field(form.full_name, 'col-md-6') }}{{ field(form.email, 'col-md-6') }}
+      {{ field(form.mobile, 'col-md-6') }}{{ field(form.roll_number, 'col-md-6') }}
+      {{ field(form.department_id, 'col-md-6') }}{{ field(form.course, 'col-md-6') }}
+      {{ field(form.graduation_year, 'col-md-6') }}<div class="col-md-6"></div>
+      {{ field(form.password, 'col-md-6', help='At least 8 characters with upper-case, lower-case and a number.') }}{{ field(form.confirm, 'col-md-6') }}
+      <div class="col-12 d-flex align-items-center gap-3"><button class="btn btn-accent px-4" data-loading="Creating account...">Create account</button><span class="text-muted">Already registered? <a href="{{ url_for('auth.login') }}">Sign in</a></span></div>
+    </div></form></div></div></div>
+</div></div></section>
+{% endblock %}

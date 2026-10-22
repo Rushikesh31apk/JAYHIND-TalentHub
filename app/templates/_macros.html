@@ -1,0 +1,77 @@
+{# Reusable UI components #}
+{% macro csrf() %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endmacro %}
+
+{% macro field(f, cls="", help="", rows=3) %}
+  <div class="{{ cls }}">
+    {% if f.type == 'BooleanField' %}
+      <div class="form-check">{{ f(class="form-check-input") }}<label class="form-check-label" for="{{ f.id }}">{{ f.label.text }}</label></div>
+    {% else %}
+      <label class="form-label" for="{{ f.id }}">{{ f.label.text }}{% if f.flags.required %} <span class="text-danger">*</span>{% endif %}</label>
+      {% set invalid = ' is-invalid' if f.errors else '' %}
+      {% if f.type in ('SelectField',) %}{{ f(class="form-select" + invalid) }}
+      {% elif f.type == 'SelectMultipleField' %}{{ f(class="form-select" + invalid, size=4) }}
+      {% elif f.type == 'TextAreaField' %}{{ f(class="form-control" + invalid, rows=rows) }}
+      {% elif f.type == 'FileField' %}{{ f(class="form-control" + invalid) }}
+      {% else %}{{ f(class="form-control" + invalid) }}{% endif %}
+      {% for e in f.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+      {% if help %}<div class="form-text">{{ help }}</div>{% endif %}
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{% macro badge(status) %}<span class="badge badge-soft-{{ status_class.get(status, 'secondary') }}">{{ status|title if status in ('pending','approved','rejected','closed','verified','scheduled','completed','cancelled') else status }}</span>{% endmacro %}
+
+{% macro empty(icon, title, text="") %}
+  <div class="empty"><i class="bi {{ icon }}"></i><div class="fw-semibold text-body">{{ title }}</div>{% if text %}<div class="small mt-1">{{ text }}</div>{% endif %}{{ caller() if caller else '' }}</div>
+{% endmacro %}
+
+{% macro ring(score, size=58) %}
+  {% set color = 'var(--green)' if score >= 75 else ('var(--saffron)' if score >= 50 else '#d64545') %}
+  <div class="ring" style="--p:{{ score }}; --size:{{ size }}px; --c:{{ color }}" title="{{ score }}% match"><span>{{ score|round|int }}%</span></div>
+{% endmacro %}
+
+{% macro stat(icon, number, label, tone="") %}
+  <div class="card h-100"><div class="stat"><div class="ico {{ tone }}"><i class="bi {{ icon }}"></i></div><div><div class="num">{{ number }}</div><div class="lbl">{{ label }}</div></div></div></div>
+{% endmacro %}
+
+{% macro pagination(page) %}
+  {% if page.pages > 1 %}
+  <nav class="mt-3 d-flex justify-content-between align-items-center flex-wrap gap-2" aria-label="Pagination">
+    <small class="text-muted">Showing page {{ page.page }} of {{ page.pages }} &middot; {{ page.total }} result{{ '' if page.total == 1 else 's' }}</small>
+    <ul class="pagination pagination-sm mb-0">
+      {% set base = request.view_args.copy() %}{% set _ = base.update(request.args.to_dict()) %}
+      <li class="page-item {{ 'disabled' if not page.has_prev }}"><a class="page-link" href="{{ url_for(request.endpoint, **dict(base, page=page.prev_num)) if page.has_prev else '#' }}">Previous</a></li>
+      {% for n in page.iter_pages() %}
+        {% if n %}<li class="page-item {{ 'active' if n == page.page }}"><a class="page-link" href="{{ url_for(request.endpoint, **dict(base, page=n)) }}">{{ n }}</a></li>
+        {% else %}<li class="page-item disabled"><span class="page-link">&hellip;</span></li>{% endif %}
+      {% endfor %}
+      <li class="page-item {{ 'disabled' if not page.has_next }}"><a class="page-link" href="{{ url_for(request.endpoint, **dict(base, page=page.next_num)) if page.has_next else '#' }}">Next</a></li>
+    </ul>
+  </nav>
+  {% endif %}
+{% endmacro %}
+
+{% macro company_logo(company, size=46) %}
+  <div class="logo-tile" style="width:{{ size }}px;height:{{ size }}px;font-size:{{ size * 0.36 }}px">
+    {% if company.logo %}<img src="{{ url_for('static', filename='uploads/' ~ company.logo) }}" alt="{{ company.name }} logo">{% else %}{{ company.initials }}{% endif %}
+  </div>
+{% endmacro %}
+
+{% macro skill_chips(skills, have=None) %}
+  {% for s in skills %}<span class="chip {{ ('ok' if s|lower in have else 'no') if have is not none }}">{{ s }}</span>{% endfor %}
+{% endmacro %}
+
+{% macro chart_card(id, title, height=240) %}
+  <div class="card h-100"><div class="card-header">{{ title }}</div><div class="card-body"><div class="chart-box" style="height:{{ height }}px"><canvas id="{{ id }}"></canvas></div></div></div>
+{% endmacro %}
+
+{% macro status_form(application, statuses, staff_url, label="") %}
+  <form method="post" action="{{ staff_url('application_status', application_id=application.id) }}" class="d-inline">{{ csrf() }}
+    <input type="hidden" name="status" value="{{ statuses }}">
+    <button class="btn btn-sm {{ 'btn-soft' if statuses != 'Rejected' else 'btn-outline-danger' }}" {% if statuses == 'Rejected' %}data-confirm="Reject this application?"{% endif %}>{{ label or statuses }}</button>
+  </form>
+{% endmacro %}
+
+{% macro photo(key, alt="", cls="", width=900) %}
+  <div class="photo {{ cls }}"><img src="{{ img(key, width) }}" alt="{{ alt }}" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"></div>
+{% endmacro %}

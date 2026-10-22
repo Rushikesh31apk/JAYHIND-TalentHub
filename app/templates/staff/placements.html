@@ -1,0 +1,27 @@
+{% extends 'base_app.html' %}
+{% from '_macros.html' import stat, field, pagination, empty, csrf, chart_card %}
+{% block title %}Placements{% endblock %}
+{% block content %}
+<div class="row g-3 mb-3">
+  <div class="col-6 col-xl-3">{{ stat('bi-trophy', stats.placed, 'Total placed', 'ico-green') }}</div>
+  <div class="col-6 col-xl-3">{{ stat('bi-percent', stats.percentage ~ '%', 'Placement percentage') }}</div>
+  <div class="col-6 col-xl-3">{{ stat('bi-graph-up-arrow', stats.highest ~ ' LPA', 'Highest package', 'ico-saffron') }}</div>
+  <div class="col-6 col-xl-3">{{ stat('bi-cash-coin', stats.average ~ ' LPA', 'Average package') }}</div>
+</div>
+<div class="row g-3 mb-3"><div class="col-md-6">{{ chart_card('chComp', 'Company-wise hiring', 220) }}</div><div class="col-md-6">{{ chart_card('chDept', 'Department-wise placement', 220) }}</div></div>
+<div class="card mb-3"><div class="card-header d-flex justify-content-between flex-wrap gap-2">Placement records
+  <div class="d-flex gap-2"><form class="d-flex gap-2" method="get"><select class="form-select form-select-sm" name="year" aria-label="Academic year"><option value="">All years</option>{% for y in years %}<option {{ 'selected' if request.args.get('year') == y }}>{{ y }}</option>{% endfor %}</select><input class="form-control form-control-sm" name="q" value="{{ request.args.get('q','') }}" placeholder="Search"><button class="btn btn-soft btn-sm">Go</button></form>
+  <button class="btn btn-accent btn-sm" data-bs-toggle="collapse" data-bs-target="#addPl"><i class="bi bi-plus-lg me-1"></i>Add record</button></div></div>
+  <div class="collapse" id="addPl"><div class="card-body border-bottom bg-light"><form method="post" action="{{ staff_url('placement_add') }}" novalidate>{{ form.hidden_tag() }}<div class="row g-2">
+    {{ field(form.student_id, 'col-md-4') }}{{ field(form.company_id, 'col-md-4') }}{{ field(form.job_role, 'col-md-4') }}{{ field(form.package, 'col-md-3') }}{{ field(form.placement_date, 'col-md-3') }}{{ field(form.academic_year, 'col-md-3') }}
+    <div class="col-md-3 d-flex align-items-end"><button class="btn btn-primary w-100" data-loading="Saving...">Save record</button></div></div></form></div></div>
+  {% if page.items %}<div class="table-responsive"><table class="table table-hover mb-0"><thead><tr><th>Student</th><th>Company</th><th>Role</th><th>Package</th><th>Date</th><th>Department</th><th>Year</th>{% if current_user.role == 'admin' %}<th></th>{% endif %}</tr></thead><tbody>
+    {% for p in page.items %}<tr><td><a class="fw-semibold text-reset" href="{{ staff_url('student_detail', student_id=p.student_id) }}">{{ p.student.name }}</a><div class="small text-muted">{{ p.student.roll_number }}</div></td><td>{{ p.company.name }}</td><td>{{ p.job_role }}</td><td><b>{{ p.package|lpa }}</b></td><td>{{ p.placement_date|d }}</td><td class="small">{{ p.department.name if p.department }}</td><td>{{ p.academic_year }}</td>
+      {% if current_user.role == 'admin' %}<td><form method="post" action="{{ staff_url('placement_delete', placement_id=p.id) }}" data-confirm="Delete this placement record?">{{ csrf() }}<button class="btn btn-outline-danger btn-sm" aria-label="Delete"><i class="bi bi-trash"></i></button></form></td>{% endif %}</tr>{% endfor %}</tbody></table></div>
+  {% else %}{% call empty('bi-trophy', 'No placement records yet', 'Marking an application as Selected creates one automatically.') %}{% endcall %}{% endif %}</div>
+{{ pagination(page) }}
+{% endblock %}
+{% block scripts %}<script>
+  TH.chart('chComp','bar',{{ stats.company_wise|map(attribute=0)|list|tojson }},{{ stats.company_wise|map(attribute=1)|list|tojson }},{label:'Placed'});
+  TH.chart('chDept','doughnut',{{ stats.dept_wise|map(attribute=0)|list|tojson }},{{ stats.dept_wise|map(attribute=1)|list|tojson }});
+</script>{% endblock %}

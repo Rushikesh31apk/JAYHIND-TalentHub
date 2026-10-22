@@ -1,0 +1,23 @@
+{% extends 'base_app.html' %}
+{% from '_macros.html' import field, badge, csrf, empty %}
+{% block title %}Interviews{% endblock %}
+{% macro actions(i) %}
+  {% if i.status == 'scheduled' %}<form class="d-inline" method="post" action="{{ staff_url('interview_update', interview_id=i.id) }}">{{ csrf() }}<button class="btn btn-soft btn-sm" name="status" value="completed">Completed</button><button class="btn btn-outline-danger btn-sm" name="status" value="cancelled" data-confirm>Cancel</button></form>{% endif %}
+{% endmacro %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-5"><div class="card sticky-side"><div class="card-header">Schedule an interview</div><div class="card-body">
+    {% if form.application_id.choices %}
+    <form method="post" novalidate>{{ form.hidden_tag() }}<div class="row g-3">{{ field(form.application_id, 'col-12') }}{{ field(form.date, 'col-6') }}{{ field(form.time, 'col-6') }}{{ field(form.interview_type, 'col-6') }}{{ field(form.interviewer, 'col-6') }}{{ field(form.location, 'col-12') }}{{ field(form.notes, 'col-12', rows=2) }}
+      <div class="col-12"><button class="btn btn-accent w-100" data-loading="Scheduling...">Schedule and notify student</button></div></div></form>
+    {% else %}{% call empty('bi-person-x', 'No candidates to interview', 'Applications in Applied, Shortlisted or Interview Scheduled status appear here.') %}{% endcall %}{% endif %}
+  </div></div></div>
+  <div class="col-lg-7 d-flex flex-column gap-3">
+    <div class="card"><div class="card-header">Upcoming ({{ upcoming|length }})</div>
+      {% for i in upcoming %}<div class="d-flex gap-3 p-3 border-bottom flex-wrap"><div class="text-center px-3 py-2 rounded" style="background:var(--saffron-soft);min-width:62px"><div class="fw-bold fs-4 lh-1">{{ i.scheduled_at.day }}</div><small>{{ i.scheduled_at.strftime('%b') }}</small></div>
+        <div class="flex-grow-1"><b>{{ i.application.student.name }}</b> <span class="text-muted">for {{ i.application.job.title }}</span><div class="small text-muted">{{ i.application.job.company.name }} &middot; {{ i.scheduled_at.strftime('%I:%M %p') }} &middot; {{ i.interview_type }} &middot; {{ i.location }}</div><div class="small">Interviewer: {{ i.interviewer }}</div></div>{{ actions(i) }}</div>
+      {% else %}<div class="empty py-4">No upcoming interviews.</div>{% endfor %}</div>
+    <div class="card"><div class="card-header">Recent / past</div>{% for i in past %}<div class="d-flex justify-content-between p-3 border-bottom"><div><b>{{ i.application.student.name }}</b> <span class="text-muted small">{{ i.application.job.title }} &middot; {{ i.application.job.company.name }}</span><div class="small text-muted">{{ i.scheduled_at|dt }}</div></div>{{ badge(i.status) }}</div>{% else %}<div class="empty py-4">Nothing here yet.</div>{% endfor %}</div>
+  </div>
+</div>
+{% endblock %}

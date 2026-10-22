@@ -1,0 +1,16 @@
+{# ATS-friendly resume sheet shared by preview and staff view #}
+{% set per = content.personal %}
+<div class="resume-sheet">
+  <h2>{{ per.name }}</h2>
+  <div>{{ [per.email, per.phone, per.city]|select|join(' | ') }}</div>
+  {% if per.linkedin or per.github or per.portfolio %}<div>{{ [per.linkedin, per.github, per.portfolio]|select|join(' | ') }}</div>{% endif %}
+  {% if content.summary %}<h6>Professional Summary</h6><p class="mb-1">{{ content.summary }}</p>{% endif %}
+  {% if content.objective %}<h6>Career Objective</h6><p class="mb-1">{{ content.objective }}</p>{% endif %}
+  {% if content.skills %}<h6>Technical Skills</h6>{% for g in content.skills %}<div><b>{{ g.category }}:</b> {{ g['items']|join(', ') }}</div>{% endfor %}{% endif %}
+  {% if content.education %}<h6>Education</h6>{% for e in content.education %}<div class="mb-1"><b>{{ e.degree }}</b><br>{{ [e.institution, e.year, e.score]|select|join(' | ') }}</div>{% endfor %}{% endif %}
+  {% if content.projects %}<h6>Projects</h6>{% for p in content.projects %}<div class="mb-2"><b>{{ p.name }}</b>{% if p.role %} ({{ p.role }}){% endif %}{% if p.duration %} - {{ p.duration }}{% endif %}
+    <ul><li>{{ p.description }}</li>{% if p.technologies %}<li><b>Technologies:</b> {{ p.technologies }}</li>{% endif %}{% if p.github or p.demo %}<li>{{ [p.github, p.demo]|select|join(' | ') }}</li>{% endif %}</ul></div>{% endfor %}{% endif %}
+  {% if content.internships %}<h6>Internships</h6>{% for i in content.internships %}<div class="mb-2"><b>{{ i.role }} - {{ i.company }}</b>{% if i.duration %} ({{ i.duration }}){% endif %}<ul><li>{{ i.description }}</li></ul></div>{% endfor %}{% endif %}
+  {% if content.certifications %}<h6>Certifications</h6><ul>{% for c in content.certifications %}<li>{{ c.name }} - {{ c.organization }}{% if c.date %} ({{ c.date }}){% endif %}{% if c.credential_id %} | ID: {{ c.credential_id }}{% endif %}</li>{% endfor %}</ul>{% endif %}
+  {% if content.achievements %}<h6>Achievements</h6><ul>{% for a in content.achievements %}<li>{{ a.title }}{% if a.description %}: {{ a.description }}{% endif %}</li>{% endfor %}</ul>{% endif %}
+</div>

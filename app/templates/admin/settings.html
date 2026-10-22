@@ -1,0 +1,12 @@
+{% extends 'base_app.html' %}
+{% from '_macros.html' import field %}
+{% block title %}System Settings{% endblock %}
+{% block content %}
+<form method="post" novalidate>{{ form.hidden_tag() }}
+<div class="row g-3"><div class="col-lg-6"><div class="card"><div class="card-header">Recruitment</div><div class="card-body vstack gap-3">
+  {{ field(form.job_approval_required) }}{{ field(form.academic_year, help='Used when placements are recorded automatically.') }}</div></div></div>
+  <div class="col-lg-6"><div class="card"><div class="card-header">Job match score weights</div><div class="card-body">
+    <p class="small text-muted">Final score = Skill x w1 + Education x w2 + Preference x w3 + Location x w4 + Experience x w5. Weights must add up to 100.</p>
+    <div class="row g-3">{{ field(form.w_skill, 'col-6') }}{{ field(form.w_education, 'col-6') }}{{ field(form.w_preference, 'col-6') }}{{ field(form.w_location, 'col-6') }}{{ field(form.w_experience, 'col-6') }}</div></div></div></div>
+  <div class="col-12"><button class="btn btn-primary" data-loading="Saving...">Save settings</button></div></div></form>
+{% endblock %}

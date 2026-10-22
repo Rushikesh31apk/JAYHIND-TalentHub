@@ -1,0 +1,50 @@
+{% extends 'base_app.html' %}
+{% from '_macros.html' import badge, pagination, empty, csrf %}
+{% block title %}Applications{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <a class="btn btn-sm {{ 'btn-primary' if not request.args.get('status') else 'btn-soft' }}" href="{{ staff_url('applications') }}">All ({{ counts.values()|sum }})</a>
+  {% for s in statuses %}<a class="btn btn-sm {{ 'btn-primary' if request.args.get('status') == s else 'btn-soft' }}" href="{{ staff_url('applications', status=s) }}">{{ s }} ({{ counts.get(s, 0) }})</a>{% endfor %}</div>
+<form class="card mb-3" method="get"><div class="card-body"><div class="row g-2 align-items-end">
+  {% if request.args.get('status') %}<input type="hidden" name="status" value="{{ request.args.get('status') }}">{% endif %}{% if request.args.get('job') %}<input type="hidden" name="job" value="{{ request.args.get('job') }}">{% endif %}
+  <div class="col-lg-3"><label class="form-label">Search</label><input class="form-control" name="q" value="{{ request.args.get('q','') }}" placeholder="Student, roll no, job, company"></div>
+  <div class="col-6 col-lg-3"><label class="form-label">Company</label><select class="form-select" name="company"><option value="">All</option>{% for c in companies %}<option value="{{ c.id }}" {{ 'selected' if request.args.get('company')|string == c.id|string }}>{{ c.name }}</option>{% endfor %}</select></div>
+  <div class="col-6 col-lg-2"><label class="form-label">Department</label><select class="form-select" name="department"><option value="">All</option>{% for d in departments %}<option value="{{ d.id }}" {{ 'selected' if request.args.get('department')|string == d.id|string }}>{{ d.name }}</option>{% endfor %}</select></div>
+  <div class="col-6 col-lg-2"><label class="form-label">Sort</label><select class="form-select" name="sort">{% for k, v in [('newest','Newest'),('oldest','Oldest'),('match','Best match'),('name','Student name')] %}<option value="{{ k }}" {{ 'selected' if request.args.get('sort') == k }}>{{ v }}</option>{% endfor %}</select></div>
+  <div class="col-6 col-lg-2 d-flex gap-2"><button class="btn btn-primary">Filter</button><a class="btn btn-soft" href="{{ staff_url('applications') }}">Reset</a></div></div></div></form>
+
+<form id="bulk" class="card mb-3" method="post" action="{{ staff_url('application_bulk') }}">{{ csrf() }}<div class="card-body py-2 d-flex flex-wrap gap-2 align-items-center">
+  <b class="small">Bulk action on selected:</b>
+  <select class="form-select form-select-sm w-auto" name="status" aria-label="Bulk status">{% for s in staff_statuses if s != 'Applied' %}<option>{{ s }}</option>{% endfor %}</select>
+  <input class="form-control form-control-sm w-auto" name="note" maxlength="255" placeholder="Note (optional)">
+  <button class="btn btn-primary btn-sm" data-confirm="Apply this status to all selected applications?">Apply to selected</button></div></form>
+
+<div class="card">{% if page.items %}<div class="table-responsive"><table class="table table-hover mb-0">
+  <thead><tr><th><input class="form-check-input" type="checkbox" data-select-all=".row-check" aria-label="Select all"></th><th>Student</th><th>Job</th><th>Match</th><th>Applied</th><th>Status</th><th class="text-end">Actions</th></tr></thead><tbody>
+  {% for a in page.items %}<tr>
+    <td><input class="form-check-input row-check" type="checkbox" name="ids" value="{{ a.id }}" form="bulk" aria-label="Select application"></td>
+    <td><a class="fw-semibold text-reset" href="{{ staff_url('student_detail', student_id=a.student_id) }}">{{ a.student.name }}</a><div class="small text-muted">{{ a.student.roll_number }} &middot; CGPA {{ a.student.cgpa if a.student.cgpa is not none else '-' }}</div></td>
+    <td><b>{{ a.job.title }}</b><div class="small text-muted">{{ a.job.company.name }}</div></td>
+    <td><div class="progress" style="width:70px"><div class="progress-bar {{ 'bg-green' if (a.match_score or 0) >= 75 else 'bg-accent' }}" style="width:{{ a.match_score or 0 }}%"></div></div><small>{{ a.match_score|round|int if a.match_score is not none }}%</small></td>
+    <td class="small">{{ a.applied_at|d }}</td><td>{{ badge(a.status) }}</td>
+    <td class="text-end text-nowrap">
+      {% if a.resume %}<a class="btn btn-soft btn-sm" href="{{ url_for('resume.staff_view', resume_id=a.resume_id) if a.resume.source == 'generated' else url_for('resume.download_any', resume_id=a.resume_id) }}" title="View resume"><i class="bi bi-file-earmark-person"></i></a>{% endif %}
+      {% if a.status not in ('Withdrawn',) %}
+        {% if a.status in ('Applied','Rejected') %}<button class="btn btn-soft btn-sm" form="st{{ a.id }}" name="status" value="Shortlisted">Shortlist</button>{% endif %}
+        {% if a.status in ('Applied','Shortlisted','Interview Scheduled') %}<a class="btn btn-soft btn-sm" href="{{ staff_url('interviews', application_id=a.id) }}">Interview</a>{% endif %}
+        {% if a.status in ('Shortlisted','Interview Scheduled','Applied') %}<button class="btn btn-success btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#selectModal" data-fill-target="#selectModal" data-fill-action="{{ staff_url('application_status', application_id=a.id) }}" data-fill-name="{{ a.student.name }} - {{ a.job.title }}" data-fill-package="{{ a.job.avg_package or '' }}">Select</button>{% endif %}
+        {% if a.status not in ('Rejected','Selected') %}<button class="btn btn-outline-danger btn-sm" form="st{{ a.id }}" name="status" value="Rejected" data-reject>Reject</button>{% endif %}
+      {% endif %}</td></tr>{% endfor %}
+</tbody></table></div>
+{% for a in page.items %}<form id="st{{ a.id }}" method="post" action="{{ staff_url('application_status', application_id=a.id) }}">{{ csrf() }}</form>{% endfor %}
+{% else %}{% call empty('bi-kanban', 'No applications found') %}{% endcall %}{% endif %}</div>
+{{ pagination(page) }}
+
+<div class="modal fade" id="selectModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog modal-dialog-centered"><form class="modal-content" method="post" data-slot="action">{{ csrf() }}
+  <div class="modal-header"><h5 class="modal-title">Mark as selected</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+  <div class="modal-body"><p class="mb-3"><b data-slot="name"></b></p><input type="hidden" name="status" value="Selected">
+    <label class="form-label" for="pkg">Offered package (LPA)</label><input class="form-control" id="pkg" name="package" type="number" step="0.01" min="0.5" data-slot="package" required>
+    <div class="form-text">This creates the official placement record and notifies the student.</div></div>
+  <div class="modal-footer"><button class="btn btn-soft" type="button" data-bs-dismiss="modal">Cancel</button><button class="btn btn-success" data-loading="Saving...">Confirm selection</button></div></form></div></div>
+{% endblock %}
+{% block scripts %}<script>document.querySelectorAll('[data-reject]').forEach(b=>b.addEventListener('click',e=>{ if(!confirm('Reject this application?')) e.preventDefault(); }));</script>{% endblock %}

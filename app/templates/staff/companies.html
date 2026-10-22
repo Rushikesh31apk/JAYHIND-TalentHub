@@ -1,0 +1,15 @@
+{% extends 'base_app.html' %}
+{% from '_macros.html' import company_logo, pagination, empty, badge %}
+{% block title %}Companies{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap gap-2 justify-content-between mb-3">
+  <form class="d-flex gap-2" method="get"><input class="form-control" name="q" value="{{ request.args.get('q','') }}" placeholder="Search companies" aria-label="Search"><button class="btn btn-soft">Search</button></form>
+  <a class="btn btn-accent" href="{{ staff_url('company_create') }}"><i class="bi bi-plus-lg me-1"></i>Add company</a></div>
+<div class="row g-3">
+  {% for c in page.items %}<div class="col-md-6 col-xl-4"><div class="card job-card"><div class="card-body d-flex flex-column">
+    <div class="d-flex gap-3">{{ company_logo(c, 52) }}<div><a class="fw-bold text-reset" href="{{ staff_url('company_detail', company_id=c.id) }}">{{ c.name }}</a><div class="small text-muted">{{ c.industry }} &middot; {{ c.location }}</div></div>{% if not c.active %}<span class="ms-auto">{{ badge('closed') }}</span>{% endif %}</div>
+    <p class="small text-muted mt-2">{{ (c.description or 'No description added.')|truncate(110) }}</p>
+    <div class="mt-auto small text-muted">{{ c.jobs|length }} job{{ '' if c.jobs|length == 1 else 's' }} posted &middot; {{ c.placements|length }} hired</div></div></div></div>
+  {% else %}<div class="col-12"><div class="card">{% call empty('bi-buildings', 'No companies yet', 'Add the first recruiter to start posting jobs.') %}{% endcall %}</div></div>{% endfor %}
+</div>{{ pagination(page) }}
+{% endblock %}

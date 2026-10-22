@@ -1,0 +1,118 @@
+{% extends 'base_app.html' %}
+{% from '_macros.html' import field, csrf, empty %}
+{% block title %}My Profile{% endblock %}
+{% macro item_actions(section, item) %}
+  <div class="table-actions text-nowrap">
+    <a class="btn btn-soft btn-sm" href="{{ url_for('student.profile', tab=section, edit=item.id) }}" aria-label="Edit"><i class="bi bi-pencil"></i></a>
+    <form class="d-inline" method="post" action="{{ url_for('student.delete_item', section=section, item_id=item.id) }}" data-confirm="Delete this entry?">{{ csrf() }}<button class="btn btn-outline-danger btn-sm" aria-label="Delete"><i class="bi bi-trash"></i></button></form>
+  </div>
+{% endmacro %}
+{% macro item_form(section, form, label) %}
+  <form method="post" action="{{ url_for('student.save_item', section=section) }}" enctype="multipart/form-data" novalidate>{{ form.hidden_tag() }}
+    {% if edit_id and tab == section %}<input type="hidden" name="item_id" value="{{ edit_id }}">{% endif %}
+    <div class="row g-3">{{ caller(form) }}
+      <div class="col-12 d-flex gap-2"><button class="btn btn-primary" data-loading="Saving...">{{ 'Update' if edit_id and tab == section else 'Add' }} {{ label }}</button>
+        {% if edit_id and tab == section %}<a class="btn btn-soft" href="{{ url_for('student.profile', tab=section) }}">Cancel</a>{% endif %}</div></div></form>
+{% endmacro %}
+{% block content %}
+{% set p = student.profile %}
+<div class="row g-3">
+  <div class="col-lg-3"><div class="card sticky-side"><div class="card-body">
+    <div class="text-center mb-3">
+      {% if p.photo %}<img class="avatar" style="width:84px;height:84px" src="{{ url_for('static', filename='uploads/' ~ p.photo) }}" alt="Profile photo">{% else %}<span class="avatar" style="width:84px;height:84px;font-size:2rem">{{ student.name[:1] }}</span>{% endif %}
+      <h5 class="mt-2 mb-0">{{ student.name }}</h5><small class="text-muted">{{ student.roll_number }}</small>
+      <div class="mt-1"><span class="badge badge-soft-{{ {'verified':'success','rejected':'danger'}.get(student.verification_status,'warning') }}">{{ student.verification_status|title }}</span></div>
+    </div>
+    <div class="d-flex justify-content-between small fw-semibold"><span>Profile completion</span><span>{{ student.completion }}%</span></div>
+    <div class="progress mb-3"><div class="progress-bar bg-accent" style="width:{{ student.completion }}%"></div></div>
+    {% for label, earned, total in breakdown %}
+      <div class="d-flex justify-content-between small mb-1"><span class="text-muted">{{ label }}</span><span class="{{ 'text-success fw-bold' if earned >= total - 0.01 }}">{{ earned|round|int }}/{{ total }}</span></div>
+    {% endfor %}
+    {% if student.verification_note %}<div class="alert alert-warning small mt-3 mb-0">{{ student.verification_note }}</div>{% endif %}
+  </div></div></div>
+
+  <div class="col-lg-9">
+    <ul class="nav nav-pills profile-tabs mb-3" role="tablist">
+      {% for key, label, icon in [('personal','Personal','bi-person'),('education','Education','bi-mortarboard'),('skills','Skills','bi-code-slash'),('projects','Projects','bi-folder2-open'),('internships','Internships','bi-building'),('certifications','Certificates','bi-patch-check'),('achievements','Achievements','bi-award'),('preferences','Preferences','bi-sliders2')] %}
+        <li class="nav-item"><a class="nav-link {{ 'active' if tab == key }}" href="{{ url_for('student.profile', tab=key) }}"><i class="bi {{ icon }} me-1"></i>{{ label }}</a></li>
+      {% endfor %}
+    </ul>
+
+    {% if tab == 'personal' %}
+    <div class="card"><div class="card-header">Personal information</div><div class="card-body">
+      <form method="post" action="{{ url_for('student.save_personal') }}" enctype="multipart/form-data" novalidate>{{ forms.personal.hidden_tag() }}
+        <div class="row g-3">
+          <div class="col-md-6"><label class="form-label">Full name</label><input class="form-control" value="{{ student.name }}" disabled></div>
+          <div class="col-md-6"><label class="form-label">Email</label><input class="form-control" value="{{ student.user.email }}" disabled></div>
+          {{ field(forms.personal.phone, 'col-md-4') }}{{ field(forms.personal.dob, 'col-md-4') }}{{ field(forms.personal.gender, 'col-md-4') }}
+          {{ field(forms.personal.address, 'col-md-8') }}{{ field(forms.personal.city, 'col-md-4') }}
+          {{ field(forms.personal.linkedin, 'col-md-4') }}{{ field(forms.personal.github, 'col-md-4') }}{{ field(forms.personal.portfolio, 'col-md-4') }}
+          {{ field(forms.personal.backlogs, 'col-md-4', help='Used in eligibility checks.') }}{{ field(forms.personal.photo, 'col-md-8', help='PNG, JPG or WEBP, up to 2 MB.') }}
+          <div class="col-12"><button class="btn btn-primary" data-loading="Saving...">Save personal information</button></div></div></form></div></div>
+
+    {% elif tab == 'education' %}
+    <div class="row g-3"><div class="col-xl-7"><div class="card"><div class="card-header">{{ 'Edit education' if edit_id else 'Add or update education' }}</div><div class="card-body">
+      <form method="post" action="{{ url_for('student.save_education') }}" novalidate>{{ forms.education.hidden_tag() }}
+        <div class="row g-3">{{ field(forms.education.level, 'col-md-6') }}{{ field(forms.education.passing_year, 'col-md-6') }}
+          {{ field(forms.education.college, 'col-12') }}{{ field(forms.education.university, 'col-md-6') }}{{ field(forms.education.course, 'col-md-6') }}
+          {{ field(forms.education.department, 'col-md-6') }}{{ field(forms.education.cgpa, 'col-md-3') }}{{ field(forms.education.percentage, 'col-md-3') }}
+          <div class="col-12"><button class="btn btn-primary" data-loading="Saving...">Save education</button></div></div></form></div></div></div>
+      <div class="col-xl-5"><div class="card"><div class="card-header">Your education</div><div class="card-body">
+        {% for e in student.education %}<div class="d-flex justify-content-between border-bottom pb-2 mb-2"><div><div class="fw-semibold">{{ e.level_label }}{% if e.course %} &middot; {{ e.course }}{% endif %}</div>
+          <div class="small text-muted">{{ e.college }}{% if e.university %}, {{ e.university }}{% endif %} &middot; {{ e.passing_year }}</div>
+          <div class="small">{% if e.cgpa is not none %}CGPA {{ e.cgpa }}{% endif %}{% if e.percentage is not none %} {{ e.percentage }}%{% endif %}</div></div>
+          <div class="table-actions text-nowrap"><a class="btn btn-soft btn-sm" href="{{ url_for('student.profile', tab='education', edit=e.id) }}"><i class="bi bi-pencil"></i></a>
+          {% if e.level != 'graduation' %}<form class="d-inline" method="post" action="{{ url_for('student.delete_education', item_id=e.id) }}" data-confirm="Delete this entry?">{{ csrf() }}<button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button></form>{% endif %}</div></div>
+        {% endfor %}</div></div></div></div>
+
+    {% elif tab == 'skills' %}
+    <div class="card"><div class="card-header">Technical &amp; soft skills</div><div class="card-body">
+      <p class="text-muted small">Separate skills with commas. Spelling variants are normalised automatically (for example "postgres" becomes PostgreSQL, "reactjs" becomes React).</p>
+      <form method="post" action="{{ url_for('student.save_skills') }}" novalidate>{{ forms.skills.hidden_tag() }}
+        <div class="row g-3">{{ field(forms.skills.languages, 'col-md-6', rows=2) }}{{ field(forms.skills.frameworks, 'col-md-6', rows=2) }}{{ field(forms.skills.databases, 'col-md-6', rows=2) }}{{ field(forms.skills.tools, 'col-md-6', rows=2) }}{{ field(forms.skills.soft_skills, 'col-12', rows=2) }}
+        <div class="col-12"><button class="btn btn-primary" data-loading="Saving...">Save skills</button></div></div></form></div></div>
+
+    {% elif tab == 'projects' %}
+    <div class="row g-3"><div class="col-xl-6"><div class="card"><div class="card-header">{{ 'Edit project' if edit_id else 'Add a project' }}</div><div class="card-body">
+      {% call(f) item_form('projects', forms.projects, 'project') %}
+        {{ field(f.name, 'col-12') }}{{ field(f.description, 'col-12', rows=3, help='Write it simply. The AI resume rewrites it professionally.') }}{{ field(f.technologies, 'col-12', help='e.g. PHP, MySQL') }}
+        {{ field(f.role, 'col-md-6') }}{{ field(f.duration, 'col-md-6') }}{{ field(f.github_url, 'col-md-6') }}{{ field(f.demo_url, 'col-md-6') }}
+      {% endcall %}</div></div></div>
+      <div class="col-xl-6">{% for pr in student.projects %}<div class="card mb-3"><div class="card-body"><div class="d-flex justify-content-between"><div><h6 class="mb-0">{{ pr.name }}</h6><small class="text-muted">{{ pr.technologies }}{% if pr.duration %} &middot; {{ pr.duration }}{% endif %}</small></div>{{ item_actions('projects', pr) }}</div><p class="small mt-2 mb-0">{{ pr.description }}</p></div></div>
+        {% else %}<div class="card"><div class="card-body">{% call empty('bi-folder2-open', 'No projects yet', 'Add at least two projects for full marks.') %}{% endcall %}</div></div>{% endfor %}</div></div>
+
+    {% elif tab == 'internships' %}
+    <div class="row g-3"><div class="col-xl-6"><div class="card"><div class="card-header">{{ 'Edit internship' if edit_id else 'Add an internship' }}</div><div class="card-body">
+      {% call(f) item_form('internships', forms.internships, 'internship') %}
+        {{ field(f.company, 'col-md-6') }}{{ field(f.role, 'col-md-6') }}{{ field(f.duration, 'col-md-6') }}{{ field(f.duration_months, 'col-md-6') }}
+        {{ field(f.description, 'col-12') }}{{ field(f.technologies, 'col-12') }}
+      {% endcall %}</div></div></div>
+      <div class="col-xl-6">{% for i in student.internships %}<div class="card mb-3"><div class="card-body"><div class="d-flex justify-content-between"><div><h6 class="mb-0">{{ i.role }} at {{ i.company }}</h6><small class="text-muted">{{ i.duration }} ({{ i.duration_months }} mo){% if i.technologies %} &middot; {{ i.technologies }}{% endif %}</small></div>{{ item_actions('internships', i) }}</div>{% if i.description %}<p class="small mt-2 mb-0">{{ i.description }}</p>{% endif %}</div></div>
+        {% else %}<div class="card"><div class="card-body">{% call empty('bi-building', 'No internships added') %}{% endcall %}</div></div>{% endfor %}</div></div>
+
+    {% elif tab == 'certifications' %}
+    <div class="row g-3"><div class="col-xl-6"><div class="card"><div class="card-header">{{ 'Edit certification' if edit_id else 'Add a certification' }}</div><div class="card-body">
+      {% call(f) item_form('certifications', forms.certifications, 'certification') %}
+        {{ field(f.name, 'col-12') }}{{ field(f.organization, 'col-md-6') }}{{ field(f.issue_date, 'col-md-6') }}{{ field(f.credential_id, 'col-md-6') }}{{ field(f.url, 'col-md-6') }}{{ field(f.file, 'col-12', help='PDF, PNG or JPG up to 5 MB. Stored privately.') }}
+      {% endcall %}</div></div></div>
+      <div class="col-xl-6">{% for c in student.certifications %}<div class="card mb-3"><div class="card-body"><div class="d-flex justify-content-between"><div><h6 class="mb-0">{{ c.name }}</h6><small class="text-muted">{{ c.organization }}{% if c.issue_date %} &middot; {{ c.issue_date|d('%b %Y') }}{% endif %}{% if c.credential_id %} &middot; ID {{ c.credential_id }}{% endif %}</small>
+        <div class="small mt-1">{% if c.file_path %}<a href="{{ url_for('main.certificate_file', cert_id=c.id) }}" target="_blank"><i class="bi bi-paperclip"></i> View file</a>{% endif %}{% if c.url %} <a href="{{ c.url }}" target="_blank" rel="noopener noreferrer">Verify online</a>{% endif %}</div></div>{{ item_actions('certifications', c) }}</div></div></div>
+        {% else %}<div class="card"><div class="card-body">{% call empty('bi-patch-check', 'No certifications yet') %}{% endcall %}</div></div>{% endfor %}</div></div>
+
+    {% elif tab == 'achievements' %}
+    <div class="row g-3"><div class="col-xl-6"><div class="card"><div class="card-header">{{ 'Edit achievement' if edit_id else 'Add an achievement' }}</div><div class="card-body">
+      {% call(f) item_form('achievements', forms.achievements, 'achievement') %}{{ field(f.title, 'col-12') }}{{ field(f.achieved_on, 'col-md-6') }}{{ field(f.description, 'col-12') }}{% endcall %}</div></div></div>
+      <div class="col-xl-6">{% for a in student.achievements %}<div class="card mb-3"><div class="card-body"><div class="d-flex justify-content-between"><div><h6 class="mb-0">{{ a.title }}</h6><small class="text-muted">{{ a.achieved_on|d('%b %Y') if a.achieved_on }}</small></div>{{ item_actions('achievements', a) }}</div>{% if a.description %}<p class="small mt-2 mb-0">{{ a.description }}</p>{% endif %}</div></div>
+        {% else %}<div class="card"><div class="card-body">{% call empty('bi-award', 'No achievements yet') %}{% endcall %}</div></div>{% endfor %}</div></div>
+
+    {% elif tab == 'preferences' %}
+    <div class="card"><div class="card-header">Career preferences</div><div class="card-body">
+      <p class="text-muted small">These feed the Career Preference and Location parts of your job match score.</p>
+      <form method="post" action="{{ url_for('student.save_preferences') }}" novalidate>{{ forms.preferences.hidden_tag() }}
+        <div class="row g-3">{{ field(forms.preferences.preferred_role, 'col-md-6') }}{{ field(forms.preferences.preferred_location, 'col-md-6', help='Comma separated, e.g. Pune, Mumbai') }}
+          {{ field(forms.preferences.work_type, 'col-md-4') }}{{ field(forms.preferences.expected_salary, 'col-md-4') }}{{ field(forms.preferences.industries, 'col-md-4', help='e.g. IT Services, Analytics') }}
+          <div class="col-12"><button class="btn btn-primary" data-loading="Saving...">Save preferences</button></div></div></form></div></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'base_app.html' %}
+{% from '_macros.html' import company_logo, badge, empty %}
+{% block title %}Interviews{% endblock %}
+{% macro row(i) %}
+  <div class="d-flex gap-3 p-3 border-bottom flex-wrap"><div class="text-center px-3 py-2 rounded" style="background:var(--saffron-soft);min-width:66px"><div class="fw-bold fs-4 lh-1">{{ i.scheduled_at.day }}</div><small>{{ i.scheduled_at.strftime('%b %Y') }}</small></div>
+    <div class="flex-grow-1"><div class="fw-bold">{{ i.application.job.title }} {{ badge(i.status) }}</div><div class="text-muted small">{{ i.application.job.company.name }}</div>
+      <div class="small mt-1"><i class="bi bi-clock"></i> {{ i.scheduled_at.strftime('%I:%M %p') }} &middot; {{ i.interview_type }} &middot; <i class="bi bi-geo-alt"></i> {{ i.location }}</div>
+      <div class="small"><i class="bi bi-person"></i> Interviewer: {{ i.interviewer }}</div>{% if i.notes %}<div class="small text-muted mt-1">{{ i.notes }}</div>{% endif %}</div></div>
+{% endmacro %}
+{% block content %}
+<div class="row g-3"><div class="col-lg-7"><div class="card"><div class="card-header">Upcoming</div>
+  {% for i in upcoming %}{{ row(i) }}{% else %}{% call empty('bi-calendar-event', 'No upcoming interviews', 'When the placement cell schedules one, it will appear here and in your notifications.') %}{% endcall %}{% endfor %}</div></div>
+  <div class="col-lg-5"><div class="card"><div class="card-header">Past and cancelled</div>{% for i in past %}{{ row(i) }}{% else %}<div class="empty py-4">Nothing here yet.</div>{% endfor %}</div></div></div>
+{% endblock %}

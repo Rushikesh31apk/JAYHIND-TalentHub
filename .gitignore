@@ -1,0 +1,12 @@
+venv/
+__pycache__/
+*.pyc
+.env
+instance/*.db
+instance/private_uploads/
+instance/test_*
+app/static/uploads/photos/*
+app/static/uploads/logos/*
+!app/static/uploads/photos/.gitkeep
+!app/static/uploads/logos/.gitkeep
+.pytest_cache/

@@ -1,0 +1,17 @@
+{% extends 'base_app.html' %}
+{% from '_macros.html' import field %}
+{% block title %}{{ 'Edit job' if job else 'Post a job' }}{% endblock %}
+{% block content %}
+<form method="post" novalidate>{{ form.hidden_tag() }}
+<div class="row g-3"><div class="col-lg-8 d-flex flex-column gap-3">
+  <div class="card"><div class="card-header">Job details</div><div class="card-body"><div class="row g-3">
+    {{ field(form.company_id, 'col-md-6') }}{{ field(form.title, 'col-md-6') }}{{ field(form.category, 'col-md-6') }}{{ field(form.location, 'col-md-6') }}
+    {{ field(form.job_type, 'col-md-4') }}{{ field(form.work_mode, 'col-md-4') }}{{ field(form.vacancies, 'col-md-4') }}
+    {{ field(form.description, 'col-12', rows=6) }}
+    {{ field(form.required_skills, 'col-md-6', rows=2, help='Used for the AI match score and eligibility.') }}{{ field(form.preferred_skills, 'col-md-6', rows=2) }}
+    {{ field(form.salary_min, 'col-md-4') }}{{ field(form.salary_max, 'col-md-4') }}{{ field(form.deadline, 'col-md-4') }}</div></div></div></div>
+  <div class="col-lg-4"><div class="card sticky-side"><div class="card-header">Eligibility criteria</div><div class="card-body"><div class="row g-3">
+    {{ field(form.courses, 'col-12', help='Hold Ctrl/Cmd to pick several. Empty means every course.') }}{{ field(form.department_id, 'col-12') }}{{ field(form.min_cgpa, 'col-6') }}{{ field(form.min_experience, 'col-6') }}
+    {{ field(form.graduation_years, 'col-12') }}{{ field(form.max_backlogs, 'col-12') }}
+    <div class="col-12 d-grid gap-2"><button class="btn btn-accent" data-loading="Saving...">Save job</button><a class="btn btn-soft" href="{{ staff_url('jobs') }}">Cancel</a></div></div></div></div></div></div></form>
+{% endblock %}

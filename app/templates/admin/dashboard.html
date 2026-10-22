@@ -1,0 +1,14 @@
+{% extends 'base_app.html' %}
+{% from '_macros.html' import stat %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">{{ stat('bi-mortarboard', users.get('student', 0), 'Student accounts') }}</div>
+  <div class="col-6 col-md-3">{{ stat('bi-person-badge', users.get('college', 0), 'Placement cell users', 'ico-saffron') }}</div>
+  <div class="col-6 col-md-3">{{ stat('bi-shield-lock', users.get('admin', 0), 'Admins') }}</div>
+  <div class="col-6 col-md-3"><a class="text-reset" href="{{ url_for('admin.jobs', status='pending') }}">{{ stat('bi-hourglass-split', pending_jobs, 'Jobs awaiting approval', 'ico-red') }}</a></div>
+</div>
+{% include 'staff/_dashboard.html' %}
+<div class="card mt-3"><div class="card-header d-flex justify-content-between">Recent activity<a class="small fw-semibold" href="{{ url_for('admin.audit') }}">Full audit log</a></div>
+  <div class="table-responsive"><table class="table mb-0"><tbody>{% for l in recent %}<tr><td class="text-muted small" style="width:150px">{{ l.created_at|ago }}</td><td><b>{{ l.action }}</b> <span class="text-muted">{{ l.details }}</span></td><td class="small text-muted">{{ l.user.email if l.user else 'system' }}</td></tr>{% else %}<tr><td class="text-muted">No activity yet.</td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'base_app.html' %}
+{% from '_macros.html' import stat, chart_card, ring, badge, empty, company_logo, photo %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+
+
+{% if student.verification_status == 'rejected' %}<div class="alert alert-danger">Your profile was not approved: {{
+  student.verification_note }}. Update it, then contact the placement cell.</div>{% endif %}
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-4 col-xl-2">{{ stat('bi-briefcase', stats.available, 'Available jobs') }}</div>
+  <div class="col-6 col-md-4 col-xl-2">{{ stat('bi-send', stats.applications, 'Applications', 'ico-saffron') }}</div>
+  <div class="col-6 col-md-4 col-xl-2">{{ stat('bi-star', stats.shortlisted, 'Shortlisted') }}</div>
+  <div class="col-6 col-md-4 col-xl-2">{{ stat('bi-calendar-event', stats.interviews, 'Interviews') }}</div>
+  <div class="col-6 col-md-4 col-xl-2">{{ stat('bi-trophy', stats.selected, 'Selected', 'ico-green') }}</div>
+  <div class="col-6 col-md-4 col-xl-2">{{ stat('bi-x-circle', stats.rejected, 'Rejected', 'ico-red') }}</div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-8">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between">Recommended jobs for you<a class="small fw-semibold"
+          href="{{ url_for('jobs.browse') }}">See all</a></div>
+      <div class="card-body p-0">
+        {% for r in recommended %}{% set j = r.obj %}
+        <div class="d-flex align-items-center gap-3 p-3 border-bottom flex-wrap">
+          {{ company_logo(j.company) }}
+          <div class="flex-grow-1" style="min-width:200px"><a class="fw-bold text-reset"
+              href="{{ url_for('jobs.detail', job_id=j.id) }}">{{ j.title }}</a>
+            <div class="small text-muted">{{ j.company.name }} &middot; {{ j.location }} &middot; {{ j.salary_display }}
+            </div>
+            <div class="small mt-1">{{ r.explanation }}</div>
+          </div>
+          <div class="text-center">{{ ring(r.score) }}<div
+              class="small {{ 'eligible' if r.eligibility.eligible else 'not-eligible' }}">{{ 'Eligible' if
+              r.eligibility.eligible else 'Not eligible' }}</div>
+          </div>
+        </div>
+        {% else %}{% call empty('bi-lightbulb', 'No recommendations yet', 'Add skills and career preferences to your
+        profile to see ranked jobs.') %}<a class="btn btn-primary btn-sm mt-3"
+          href="{{ url_for('student.profile', tab='skills') }}">Add skills</a>{% endcall %}{% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4 d-flex flex-column gap-3">
+    <div class="card">
+      <div class="card-header">Upcoming interviews</div>
+      <div class="card-body">
+        {% for i in upcoming %}<div class="d-flex gap-3 mb-3">
+          <div class="text-center px-2 py-1 rounded" style="background:var(--saffron-soft);min-width:54px">
+            <div class="fw-bold fs-5 lh-1">{{ i.scheduled_at.day }}</div><small>{{ i.scheduled_at.strftime('%b')
+              }}</small>
+          </div>
+          <div>
+            <div class="fw-semibold">{{ i.application.job.title }}</div>
+            <div class="small text-muted">{{ i.application.job.company.name }} &middot; {{
+              i.scheduled_at.strftime('%I:%M %p') }} &middot; {{ i.interview_type }}</div>
+          </div>
+        </div>
+        {% else %}<div class="text-muted small">No interviews scheduled.</div>{% endfor %}</div>
+    </div>
+    <div class="card flex-grow-1">
+      <div class="card-header d-flex justify-content-between">Notifications<a class="small fw-semibold"
+          href="{{ url_for('main.notifications') }}">All</a></div>
+      <div class="card-body">
+        {% for n in notes %}<div class="mb-2 small"><b>{{ n.title }}</b>
+          <div class="text-muted">{{ n.message }}</div>
+        </div>{% else %}<div class="text-muted small">Nothing new.</div>{% endfor %}</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-6 col-xl-3">{{ chart_card('chStatus', 'Application status') }}</div>
+  <div class="col-md-6 col-xl-3">{{ chart_card('chCats', 'Open jobs by category') }}</div>
+  <div class="col-md-6 col-xl-3">{{ chart_card('chSkills', 'Your skill distribution') }}</div>
+  <div class="col-md-6 col-xl-3">{{ chart_card('chHist', 'Application history') }}</div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  const C = {{ charts| tojson }};
+  TH.chart('chStatus', 'doughnut', C.status.labels, C.status.data);
+  TH.chart('chCats', 'bar', C.categories.labels, C.categories.data, { label: 'Jobs', color: '#16a34a' });
+  TH.chart('chSkills', 'doughnut', C.skills.labels, C.skills.data);
+  TH.chart('chHist', 'line', C.history.labels, C.history.data, { label: 'Applications' });
+</script>{% endblock %}

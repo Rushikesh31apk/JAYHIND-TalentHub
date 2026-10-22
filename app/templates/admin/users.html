@@ -1,0 +1,25 @@
+{% extends 'base_app.html' %}
+{% from '_macros.html' import pagination, badge, csrf, field, empty %}
+{% block title %}{{ 'College Users' if locked_roles else 'Users' }}{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
+  {% if not locked_roles %}{% for key, label in [(None,'All'),('student','Students'),('college','Placement cell'),('admin','Admins')] %}<a class="btn btn-sm {{ 'btn-primary' if role == key else 'btn-soft' }}" href="{{ url_for('admin.users', role=key) }}">{{ label }}</a>{% endfor %}{% endif %}
+  <form class="d-flex gap-2 ms-auto" method="get"><input class="form-control form-control-sm" name="q" value="{{ request.args.get('q','') }}" placeholder="Search name or email" aria-label="Search">{% if role and not locked_roles %}<input type="hidden" name="role" value="{{ role }}">{% endif %}<button class="btn btn-soft btn-sm">Search</button></form>
+  <button class="btn btn-accent btn-sm" data-bs-toggle="modal" data-bs-target="#userModal"><i class="bi bi-plus-lg me-1"></i>Create account</button></div>
+<div class="card">{% if page.items %}<div class="table-responsive"><table class="table table-hover mb-0"><thead><tr><th>User</th><th>Role</th><th>Last login</th><th>Status</th><th class="text-end">Actions</th></tr></thead><tbody>
+  {% for u in page.items %}<tr><td><b>{{ u.full_name }}</b><div class="small text-muted">{{ u.email }}</div></td><td><span class="badge badge-soft-{{ {'admin':'danger','college':'warning'}.get(u.role,'primary') }}">{{ u.role|replace('college','placement cell')|title }}</span></td>
+    <td class="small">{{ u.last_login|dt if u.last_login else 'Never' }}</td><td>{% if u.is_locked %}<span class="badge badge-soft-warning">Locked</span>{% elif u.active %}<span class="badge badge-soft-success">Active</span>{% else %}<span class="badge badge-soft-secondary">Deactivated</span>{% endif %}</td>
+    <td class="text-end text-nowrap">{% if u.role == 'student' and u.student %}<a class="btn btn-soft btn-sm" href="{{ url_for('admin.student_detail', student_id=u.student.id) }}">Profile</a>{% endif %}
+      <button class="btn btn-soft btn-sm" data-bs-toggle="modal" data-bs-target="#pwModal" data-fill-target="#pwModal" data-fill-action="{{ url_for('admin.user_reset_password', user_id=u.id) }}" data-fill-name="{{ u.full_name }}">Reset password</button>
+      {% if u.id != current_user.id %}<form class="d-inline" method="post" action="{{ url_for('admin.user_toggle', user_id=u.id) }}" data-confirm="{{ 'Deactivate' if u.active else 'Activate' }} {{ u.full_name }}?">{{ csrf() }}<button class="btn btn-sm {{ 'btn-outline-danger' if u.active else 'btn-outline-success' }}">{{ 'Deactivate' if u.active else 'Activate' }}</button></form>{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+  {% else %}{% call empty('bi-person-x', 'No users found') %}{% endcall %}{% endif %}</div>
+{{ pagination(page) }}
+<div class="modal fade" id="userModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog modal-dialog-centered"><form class="modal-content" method="post" action="{{ url_for('admin.user_create') }}" novalidate>{{ form.hidden_tag() }}
+  <div class="modal-header"><h5 class="modal-title">Create staff account</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+  <div class="modal-body"><div class="row g-3">{{ field(form.full_name, 'col-12') }}{{ field(form.email, 'col-md-7') }}{{ field(form.phone, 'col-md-5') }}{{ field(form.role, 'col-md-6') }}{{ field(form.designation, 'col-md-6') }}{{ field(form.password, 'col-12', help='The user can change it after first sign-in.') }}</div></div>
+  <div class="modal-footer"><button class="btn btn-soft" type="button" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary" data-loading="Creating...">Create account</button></div></form></div></div>
+<div class="modal fade" id="pwModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog modal-dialog-centered"><form class="modal-content" method="post" data-slot="action">{{ csrf() }}
+  <div class="modal-header"><h5 class="modal-title">Reset password</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+  <div class="modal-body"><p>Set a new temporary password for <b data-slot="name"></b>.</p><input class="form-control" type="text" name="password" minlength="8" required autocomplete="off" placeholder="New password (8+ chars, upper, lower, number)"></div>
+  <div class="modal-footer"><button class="btn btn-soft" type="button" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary">Reset password</button></div></form></div></div>
+{% endblock %}

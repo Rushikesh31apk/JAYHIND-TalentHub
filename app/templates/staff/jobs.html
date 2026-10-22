@@ -1,0 +1,25 @@
+{% extends 'base_app.html' %}
+{% from '_macros.html' import company_logo, badge, pagination, empty, csrf %}
+{% block title %}Jobs{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+  <a class="btn btn-sm {{ 'btn-primary' if not request.args.get('status') else 'btn-soft' }}" href="{{ staff_url('jobs') }}">All</a>
+  {% for s in ['pending','approved','rejected','closed'] %}<a class="btn btn-sm {{ 'btn-primary' if request.args.get('status') == s else 'btn-soft' }}" href="{{ staff_url('jobs', status=s) }}">{{ s|title }} ({{ counts.get(s, 0) }})</a>{% endfor %}
+  <form class="d-flex gap-2 ms-auto" method="get"><input class="form-control form-control-sm" name="q" value="{{ request.args.get('q','') }}" placeholder="Search jobs" aria-label="Search"><button class="btn btn-soft btn-sm">Search</button></form>
+  <a class="btn btn-accent btn-sm" href="{{ staff_url('job_create') }}"><i class="bi bi-plus-lg me-1"></i>Post job</a></div>
+<div class="card">{% if page.items %}<div class="table-responsive"><table class="table table-hover mb-0">
+  <thead><tr><th>Job</th><th>Eligibility</th><th>Package</th><th>Deadline</th><th>Applicants</th><th>Status</th><th></th></tr></thead><tbody>
+  {% for j in page.items %}<tr><td><div class="d-flex gap-2 align-items-center">{{ company_logo(j.company, 36) }}<div><b>{{ j.title }}</b><div class="small text-muted">{{ j.company.name }} &middot; {{ j.location }}</div></div></div></td>
+    <td class="small">CGPA {{ j.min_cgpa|round(1) }}+<br><span class="text-muted">{{ j.graduation_years or 'Any batch' }}</span></td><td>{{ j.salary_display }}</td><td>{{ j.deadline|d }}{% if j.status == 'approved' and j.deadline < today %}<div class="small text-danger">Expired</div>{% endif %}</td>
+    <td><a href="{{ staff_url('applications', job=j.id) }}">{{ app_counts.get(j.id, 0) }}</a> / {{ j.vacancies }}</td><td>{{ badge(j.status) }}</td>
+    <td class="text-end text-nowrap">
+      {% if current_user.role == 'admin' and j.status == 'pending' %}
+        <form class="d-inline" method="post" action="{{ staff_url('job_status', job_id=j.id) }}">{{ csrf() }}<button class="btn btn-sm btn-primary" name="action" value="approve">Approve</button><button class="btn btn-sm btn-outline-danger" name="action" value="reject">Reject</button></form>
+      {% endif %}
+      <a class="btn btn-soft btn-sm" href="{{ staff_url('job_edit', job_id=j.id) }}" aria-label="Edit"><i class="bi bi-pencil"></i></a>
+      {% if j.status in ('approved','pending') %}<form class="d-inline" method="post" action="{{ staff_url('job_status', job_id=j.id) }}" data-confirm="Close this job for new applications?">{{ csrf() }}<button class="btn btn-outline-secondary btn-sm" name="action" value="close">Close</button></form>
+      {% elif j.status in ('closed','rejected') %}<form class="d-inline" method="post" action="{{ staff_url('job_status', job_id=j.id) }}">{{ csrf() }}<button class="btn btn-outline-secondary btn-sm" name="action" value="reopen">Reopen</button></form>{% endif %}
+      {% if current_user.role == 'admin' %}<form class="d-inline" method="post" action="{{ staff_url('job_delete', job_id=j.id) }}" data-confirm="Delete this job?">{{ csrf() }}<button class="btn btn-outline-danger btn-sm" aria-label="Delete"><i class="bi bi-trash"></i></button></form>{% endif %}</td></tr>{% endfor %}
+</tbody></table></div>{% else %}{% call empty('bi-briefcase', 'No jobs found', 'Post a job to start receiving applications.') %}{% endcall %}{% endif %}</div>
+{{ pagination(page) }}
+{% endblock %}

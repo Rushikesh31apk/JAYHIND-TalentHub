@@ -1,0 +1,21 @@
+{% extends 'base_public.html' %}
+{% from '_macros.html' import company_logo, pagination, empty, skill_chips, photo %}
+{% block title %}Jobs | JAYHIND TalentHub{% endblock %}
+{% block content %}
+<section class="page-head"><div class="container"><div class="card banner"><div class="card-body p-4 p-lg-5"><div class="row align-items-center g-4"><div class="col-lg-7"><h2 class="text-white mb-2">Open opportunities</h2><p class="mb-0" style="color:#ecfdf0">Sign in as a student to see your match score, check eligibility and apply.</p></div><div class="col-lg-5 d-none d-lg-block">{{ photo('team', 'Team at work', width=700, cls='ratio ratio-21x9') }}</div></div></div></div></div></section>
+<section class="pb-0"><div class="container pt-3">
+  <form class="row g-2 mb-4" method="get"><div class="col-md-6"><input class="form-control" name="q" value="{{ q }}" placeholder="Search by role, company or city" aria-label="Search jobs"></div>
+    <div class="col-auto"><button class="btn btn-primary"><i class="bi bi-search me-1"></i>Search</button></div></form>
+</div></section>
+<section class="pb-5"><div class="container"><div class="row g-3">
+  {% for job in page.items %}
+  <div class="col-md-6 col-lg-4"><div class="card job-card"><div class="card-body d-flex flex-column">
+    <div class="d-flex gap-3 mb-2">{{ company_logo(job.company) }}<div><h5 class="mb-0">{{ job.title }}</h5><div class="text-muted small">{{ job.company.name }}</div></div></div>
+    <div class="small text-muted mb-2"><i class="bi bi-geo-alt"></i> {{ job.location }} &nbsp; <i class="bi bi-cash"></i> {{ job.salary_display }} &nbsp; <i class="bi bi-clock"></i> {{ job.job_type }}</div>
+    <div class="mb-2">{{ skill_chips(job.required_skill_names[:5]) }}</div>
+    <div class="mt-auto d-flex justify-content-between align-items-center"><small class="text-muted">Apply by {{ job.deadline|d }}</small>
+      <a class="btn btn-accent btn-sm" href="{{ url_for('auth.login', next=url_for('jobs.detail', job_id=job.id)) }}">Sign in to apply</a></div>
+  </div></div></div>
+  {% else %}<div class="col-12">{% call empty('bi-briefcase', 'No open jobs match your search', 'Try a different keyword or check back soon.') %}{% endcall %}</div>{% endfor %}
+</div>{{ pagination(page) }}</div></section>
+{% endblock %}

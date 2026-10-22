@@ -1,0 +1,44 @@
+{% extends 'base_app.html' %}
+{% from '_macros.html' import company_logo, ring, skill_chips, badge, csrf %}
+{% block title %}{{ job.title }}{% endblock %}
+{% block content %}
+{% set elig = result.eligibility %}{% set m = result.match %}
+<a class="small text-muted" href="{{ url_for('jobs.browse') }}"><i class="bi bi-arrow-left"></i> Back to jobs</a>
+<div class="row g-3 mt-1">
+  <div class="col-lg-8 d-flex flex-column gap-3">
+    <div class="card"><div class="card-body">
+      <div class="d-flex gap-3 flex-wrap">{{ company_logo(job.company, 58) }}
+        <div class="flex-grow-1"><h3 class="mb-0">{{ job.title }}</h3><div class="text-muted">{{ job.company.name }} &middot; {{ job.company.industry }}</div>
+          <div class="mt-2 small"><span class="me-3"><i class="bi bi-geo-alt"></i> {{ job.location }} ({{ job.work_mode }})</span><span class="me-3"><i class="bi bi-cash"></i> {{ job.salary_display }}</span><span class="me-3"><i class="bi bi-clock"></i> {{ job.job_type }}</span><span class="me-3"><i class="bi bi-person-workspace"></i> {{ job.experience_display }}</span><span><i class="bi bi-people"></i> {{ job.vacancies }} vacanc{{ 'y' if job.vacancies == 1 else 'ies' }}</span></div></div>
+        <div class="text-center">{{ ring(result.score, 76) }}<div class="small fw-bold mt-1">{{ result.label.title() }}</div></div></div>
+      <hr><h6>About the role</h6><p style="white-space:pre-line">{{ job.description }}</p>
+      <h6>Required skills</h6>{{ skill_chips(job.required_skill_names, have=(elig.skills|selectattr('matched')|map(attribute='name')|map('lower')|list)) }}
+      {% if job.preferred_skill_names %}<h6 class="mt-3">Nice to have</h6>{{ skill_chips(job.preferred_skill_names) }}{% endif %}
+      <p class="small text-muted mt-3 mb-0">Apply before {{ job.deadline|d }}. Green skills are ones you already have; red ones are missing.</p>
+    </div></div>
+
+    <div class="card"><div class="card-header">How your match score is calculated</div><div class="card-body">
+      <p class="small text-muted">{{ result.explanation }}</p>
+      {% set names = {'skill':'Skill match','education':'Education match','preference':'Career preference','location':'Location preference','experience':'Experience match'} %}
+      {% for key, c in m.components.items() %}
+        <div class="mb-3"><div class="d-flex justify-content-between small fw-semibold"><span>{{ names[key] }} <span class="text-muted fw-normal">weight {{ c.weight }}%</span></span><span>{{ c.score }}% &rarr; {{ c.points }} pts</span></div>
+          <div class="progress mt-1"><div class="progress-bar {{ 'bg-green' if c.score >= 70 else ('bg-accent' if c.score >= 40 else 'bg-danger') }}" style="width:{{ c.score }}%"></div></div></div>
+      {% endfor %}
+      <div class="p-3 rounded small" style="background:#effaf3"><b>Final score {{ result.score }}%</b> = sum of the points above. Skill match uses 80% skill overlap ({{ m.skills.percent }}%) plus 20% TF-IDF cosine similarity ({{ m.skills.cosine }}, scaled to {{ m.skills.semantic }}%).</div>
+    </div></div>
+  </div>
+
+  <div class="col-lg-4"><div class="card sticky-side"><div class="card-header">Eligibility check</div><div class="card-body">
+    {% for c in elig.checks %}<div class="check-row"><div><div class="fw-semibold small">{{ c.label }}</div><div class="small text-muted">Needs: {{ c.required }} &middot; You: {{ c.actual }}</div>{% if c.note %}<div class="small text-danger">{{ c.note }}</div>{% endif %}</div>
+      <div class="{{ 'eligible' if c.passed else 'not-eligible' }} fs-5">{{ '✓' if c.passed else '✗' }}</div></div>{% endfor %}
+    {% if elig.skills %}<div class="mt-2 small fw-semibold">Skills</div><div class="mb-2">{% for s in elig.skills %}<span class="chip {{ 'ok' if s.matched else 'no' }}">{{ s.name }} {{ '✓' if s.matched else '✗' }}</span>{% endfor %}</div>{% endif %}
+    <div class="text-center py-2 fs-5 {{ 'eligible' if elig.eligible else 'not-eligible' }}">{{ 'ELIGIBLE' if elig.eligible else 'NOT ELIGIBLE' }}</div>
+    {% if not elig.eligible %}<ul class="small text-danger ps-3">{% for r in elig.reasons %}<li>{{ r }}</li>{% endfor %}</ul>{% endif %}
+    {% if existing and existing.status != 'Withdrawn' %}
+      <div class="alert alert-info mb-0 text-center">You applied on {{ existing.applied_at|d }}<br>{{ badge(existing.status) }} <a class="d-block mt-2" href="{{ url_for('jobs.applications') }}">Track application</a></div>
+    {% elif not job.is_open %}<button class="btn btn-secondary w-100" disabled>Applications closed</button>
+    {% elif elig.eligible %}<form method="post" action="{{ url_for('jobs.apply', job_id=job.id) }}">{{ csrf() }}<button class="btn btn-accent w-100 py-2" data-loading="Submitting...">Apply now</button></form><div class="small text-muted text-center mt-2">Your latest resume is attached automatically.</div>
+    {% else %}<button class="btn btn-secondary w-100" disabled>Not eligible to apply</button>{% endif %}
+  </div></div></div>
+</div>
+{% endblock %}

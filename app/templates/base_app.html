@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{% block title %}Dashboard{% endblock %} | JAYHIND TalentHub</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/app.css') }}" rel="stylesheet">
+  {% block head %}{% endblock %}
+</head>
+<body>
+{% from '_macros.html' import csrf %}
+<div class="app">
+  <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+    <a class="brand" href="{{ url_for('main.index') }}">
+      <img class="brand-mark" src="{{ url_for('static', filename='images/logo.svg') }}" alt="">
+      <span class="brand-name">Jayhind<span class="hl">Talent</span>Hub<small>{{ current_user.role|replace('college','placement cell')|title }} portal</small></span>
+    </a>
+    <nav>
+      {% for label, icon, endpoint in nav_items %}
+        {% set cur = request.endpoint %}
+        {% set active = cur == endpoint or (endpoint == 'jobs.browse' and cur in ('jobs.detail',)) or (endpoint == 'student.profile' and cur.startswith('student.save')) or (endpoint == 'resume.index' and cur.startswith('resume.')) or (request.blueprint in ('college','admin') and endpoint.split('.')[0] == request.blueprint and endpoint.split('.')[1][:3] == cur.split('.')[1][:3] and endpoint.split('.')[1] != 'dashboard') %}
+        <a class="nav-link {{ 'active' if active }}" href="{{ url_for(endpoint) }}">
+          <i class="bi {{ icon }}"></i>{{ label }}
+          {% if endpoint == 'main.notifications' and unread_count %}<span class="badge rounded-pill ms-auto" style="background:var(--saffron);color:#1d1200">{{ unread_count }}</span>{% endif %}
+        </a>
+      {% endfor %}
+    </nav>
+    <div class="side-foot"><b>{{ college_name }}</b><br>Kuran, Narayangaon, Pune</div>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <button class="btn btn-soft d-lg-none" id="sidebarToggle" aria-label="Open menu"><i class="bi bi-list fs-5"></i></button>
+      <h1 class="flex-grow-1">{% block page_title %}{{ self.title() }}{% endblock %}</h1>
+      <a class="bell" href="{{ url_for('main.notifications') }}" aria-label="Notifications"><i class="bi bi-bell"></i><span class="dot {{ 'd-none' if not unread_count }}" id="notifDot">{{ unread_count }}</span></a>
+      <div class="dropdown">
+        <button class="btn p-0 border-0 d-flex align-items-center gap-2" data-bs-toggle="dropdown" aria-label="Account menu">
+          {% if current_user.role == 'student' and current_user.student.profile.photo %}
+            <img class="avatar" src="{{ url_for('static', filename='uploads/' ~ current_user.student.profile.photo) }}" alt="">
+          {% else %}<span class="avatar">{{ current_user.full_name[:1] }}</span>{% endif %}
+          <span class="d-none d-md-block text-start lh-sm"><span class="fw-semibold d-block">{{ current_user.full_name }}</span><small class="text-muted">{{ current_user.email }}</small></span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+          {% if current_user.role == 'student' %}<li><a class="dropdown-item" href="{{ url_for('student.profile') }}"><i class="bi bi-person me-2"></i>My profile</a></li>{% endif %}
+          <li><a class="dropdown-item" href="{{ url_for('auth.change_password') }}"><i class="bi bi-key me-2"></i>Change password</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><form method="post" action="{{ url_for('auth.logout') }}">{{ csrf() }}<button class="dropdown-item text-danger"><i class="bi bi-box-arrow-right me-2"></i>Sign out</button></form></li>
+        </ul>
+      </div>
+    </header>
+    <div class="toast-zone">
+      {% with messages = get_flashed_messages(with_categories=true) %}{% for cat, msg in messages %}
+        <div class="alert alert-{{ cat if cat in ('success','danger','warning','info') else 'info' }} alert-dismissible fade show" role="alert">{{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
+      {% endfor %}{% endwith %}
+    </div>
+    <main class="content">{% block content %}{% endblock %}</main>
+  </div>
+</div>
+<div class="modal fade" id="matchModal" tabindex="-1" aria-labelledby="matchTitle" aria-hidden="true"><div class="modal-dialog modal-dialog-centered"><div class="modal-content border-0">
+  <div class="modal-header"><h5 class="modal-title" id="matchTitle">Why this match?</h5><button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+  <div class="modal-body" id="matchBody"></div></div></div></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

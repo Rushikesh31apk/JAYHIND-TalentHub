@@ -1,0 +1,44 @@
+{% extends 'base_app.html' %}
+{% from '_macros.html' import badge, csrf, skill_chips, company_logo %}
+{% block title %}{{ student.name }}{% endblock %}
+{% block content %}
+{% set p = student.profile %}
+<a class="small text-muted" href="{{ staff_url('students') }}"><i class="bi bi-arrow-left"></i> All students</a>
+<div class="row g-3 mt-1">
+  <div class="col-lg-4 d-flex flex-column gap-3">
+    <div class="card"><div class="card-body text-center">
+      {% if p.photo %}<img class="avatar" style="width:92px;height:92px" src="{{ url_for('static', filename='uploads/' ~ p.photo) }}" alt="">{% else %}<span class="avatar" style="width:92px;height:92px;font-size:2.2rem">{{ student.name[:1] }}</span>{% endif %}
+      <h4 class="mt-2 mb-0">{{ student.name }}</h4><div class="text-muted small">{{ student.roll_number }} &middot; {{ student.course }}</div>
+      <div class="mt-2">{{ badge(student.verification_status) }}{% if student.is_placed %} <span class="badge badge-soft-success">Placed</span>{% endif %}</div>
+      <hr><div class="text-start small vstack gap-1">
+        <div><i class="bi bi-envelope me-2"></i>{{ student.user.email }}</div><div><i class="bi bi-telephone me-2"></i>{{ student.user.phone or '-' }}</div>
+        <div><i class="bi bi-geo-alt me-2"></i>{{ p.city or '-' }}</div><div><i class="bi bi-calendar me-2"></i>Batch {{ student.graduation_year }} &middot; Backlogs: {{ p.backlogs }}</div>
+        {% if p.linkedin %}<div><i class="bi bi-linkedin me-2"></i><a href="{{ p.linkedin }}" target="_blank" rel="noopener noreferrer">LinkedIn</a></div>{% endif %}
+        {% if p.github %}<div><i class="bi bi-github me-2"></i><a href="{{ p.github }}" target="_blank" rel="noopener noreferrer">GitHub</a></div>{% endif %}</div>
+      <div class="mt-3 text-start"><div class="d-flex justify-content-between small fw-semibold"><span>Profile completion</span><span>{{ student.completion }}%</span></div><div class="progress"><div class="progress-bar bg-accent" style="width:{{ student.completion }}%"></div></div></div>
+    </div></div>
+    <div class="card"><div class="card-header">Verify profile</div><div class="card-body">
+      {% if student.verification_note %}<div class="alert alert-warning small">{{ student.verification_note }}</div>{% endif %}
+      <form method="post" action="{{ staff_url('student_verify', student_id=student.id) }}">{{ csrf() }}
+        <textarea class="form-control mb-2" name="note" rows="2" maxlength="255" placeholder="Note to student (required when rejecting)"></textarea>
+        <div class="d-flex gap-2"><button class="btn btn-sm btn-primary" name="decision" value="verified">Approve</button><button class="btn btn-sm btn-outline-danger" name="decision" value="rejected">Reject</button><button class="btn btn-sm btn-soft" name="decision" value="pending">Reset</button></div></form></div></div>
+    <div class="card"><div class="card-header">Resume</div><div class="card-body">
+      {% set r = student.latest_resume %}{% if r %}<div class="small mb-2">Latest: v{{ r.version }} ({{ 'AI generated' if r.source == 'generated' else 'uploaded' }}){% if r.ats_score %} &middot; ATS {{ r.ats_score|round|int }}/100{% endif %}</div>
+        <div class="d-flex gap-2">{% if r.source == 'generated' %}<a class="btn btn-soft btn-sm" href="{{ url_for('resume.staff_view', resume_id=r.id) }}">Preview</a>{% endif %}<a class="btn btn-primary btn-sm" href="{{ url_for('resume.download_any', resume_id=r.id) }}">Download PDF</a></div>
+      {% else %}<div class="text-muted small">No resume generated yet.</div>{% endif %}</div></div>
+  </div>
+  <div class="col-lg-8 d-flex flex-column gap-3">
+    <div class="card"><div class="card-header">Skills</div><div class="card-body">{{ skill_chips(student.skill_names) }}{% if not student.skills %}<span class="text-muted small">No skills added.</span>{% endif %}</div></div>
+    <div class="card"><div class="card-header">Education</div><div class="card-body">{% for e in student.education %}<div class="mb-2"><b>{{ e.level_label }}</b>{% if e.course %} &middot; {{ e.course }}{% endif %}<div class="small text-muted">{{ e.college }}{% if e.university %}, {{ e.university }}{% endif %} &middot; {{ e.passing_year }} &middot; {% if e.cgpa is not none %}CGPA {{ e.cgpa }}{% endif %}{% if e.percentage is not none %}{{ e.percentage }}%{% endif %}</div></div>{% endfor %}</div></div>
+    <div class="card"><div class="card-header">Projects, internships &amp; certifications</div><div class="card-body">
+      {% for pr in student.projects %}<div class="mb-2"><b>{{ pr.name }}</b> <span class="small text-muted">{{ pr.technologies }}</span><div class="small">{{ pr.description }}</div></div>{% endfor %}
+      {% for i in student.internships %}<div class="mb-2"><b>{{ i.role }}</b> at {{ i.company }} <span class="small text-muted">({{ i.duration_months }} mo)</span><div class="small">{{ i.description }}</div></div>{% endfor %}
+      {% for c in student.certifications %}<div class="small mb-1"><i class="bi bi-patch-check text-success"></i> {{ c.name }} &mdash; {{ c.organization }}{% if c.file_path %} <a href="{{ url_for('main.certificate_file', cert_id=c.id) }}" target="_blank">file</a>{% endif %}</div>{% endfor %}
+      {% for a in student.achievements %}<div class="small mb-1"><i class="bi bi-award text-warning"></i> {{ a.title }}</div>{% endfor %}
+      {% if not (student.projects or student.internships or student.certifications) %}<span class="text-muted small">Nothing added yet.</span>{% endif %}</div></div>
+    <div class="card"><div class="card-header">Applications</div>{% if applications %}<div class="table-responsive"><table class="table mb-0"><thead><tr><th>Job</th><th>Match</th><th>Applied</th><th>Status</th></tr></thead><tbody>
+      {% for a in applications %}<tr><td><b>{{ a.job.title }}</b><div class="small text-muted">{{ a.job.company.name }}</div></td><td>{{ a.match_score|round|int if a.match_score is not none }}%</td><td>{{ a.applied_at|d }}</td><td>{{ badge(a.status) }}</td></tr>{% endfor %}</tbody></table></div>
+      {% else %}<div class="card-body text-muted small">No applications yet.</div>{% endif %}</div>
+  </div>
+</div>
+{% endblock %}

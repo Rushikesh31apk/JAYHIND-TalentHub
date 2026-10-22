@@ -1,0 +1,14 @@
+{% extends 'base_app.html' %}
+{% block title %}Edit Resume{% endblock %}
+{% block content %}
+<form method="post" class="card" style="max-width:900px">{{ form.hidden_tag() }}<div class="card-body">
+  <p class="text-muted">Edit the AI-written text. Saving re-calculates your ATS score. To start over from your profile, use Regenerate.</p>
+  <div class="mb-3"><label class="form-label" for="headline">Target role</label><input class="form-control" id="headline" name="headline" maxlength="120" value="{{ content.headline }}"></div>
+  <div class="mb-3"><label class="form-label" for="summary">Professional summary</label><textarea class="form-control" id="summary" name="summary" rows="4" maxlength="900">{{ content.summary }}</textarea></div>
+  <div class="mb-3"><label class="form-label" for="objective">Career objective</label><textarea class="form-control" id="objective" name="objective" rows="3" maxlength="600">{{ content.objective }}</textarea></div>
+  {% for g in content.skills %}<div class="mb-3"><label class="form-label">{{ g.category }}</label><input class="form-control" name="skills_{{ loop.index0 }}" value="{{ g['items']|join(', ') }}"></div>{% endfor %}
+  {% for p in content.projects %}<div class="mb-3"><label class="form-label">Project: {{ p.name }}</label><textarea class="form-control" name="project_{{ loop.index0 }}" rows="3" maxlength="1500">{{ p.description }}</textarea></div>{% endfor %}
+  {% for i in content.internships %}<div class="mb-3"><label class="form-label">Internship: {{ i.role }} at {{ i.company }}</label><textarea class="form-control" name="intern_{{ loop.index0 }}" rows="3" maxlength="1500">{{ i.description }}</textarea></div>{% endfor %}
+  <div class="d-flex gap-2"><button class="btn btn-primary" data-loading="Saving...">Save changes</button><a class="btn btn-soft" href="{{ url_for('resume.preview') }}">Cancel</a></div>
+</div></form>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% from '_macros.html' import stat, chart_card %}
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-4 col-xl-3">{{ stat('bi-people', stats.total_students, 'Total students') }}</div>
+  <div class="col-6 col-md-4 col-xl-3">{{ stat('bi-person-check', stats.registered, 'Registered students', 'ico-green') }}</div>
+  <div class="col-6 col-md-4 col-xl-3">{{ stat('bi-person-vcard', stats.profile_completed, 'Profiles 80%+ complete') }}</div>
+  <div class="col-6 col-md-4 col-xl-3">{{ stat('bi-briefcase', stats.active_jobs, 'Active jobs', 'ico-saffron') }}</div>
+  <div class="col-6 col-md-4 col-xl-3">{{ stat('bi-send', stats.applications, 'Applications') }}</div>
+  <div class="col-6 col-md-4 col-xl-3">{{ stat('bi-star', stats.shortlisted, 'Shortlisted', 'ico-saffron') }}</div>
+  <div class="col-6 col-md-4 col-xl-3">{{ stat('bi-calendar-event', stats.interviews, 'Interviews scheduled') }}</div>
+  <div class="col-6 col-md-4 col-xl-3">{{ stat('bi-trophy', stats.placed, 'Placed students', 'ico-green') }}</div>
+  <div class="col-6 col-md-4 col-xl-3">{{ stat('bi-percent', stats.rate ~ '%', 'Placement rate', 'ico-green') }}</div>
+  <div class="col-6 col-md-4 col-xl-3">{{ stat('bi-graph-up-arrow', stats.highest ~ ' LPA', 'Highest package') }}</div>
+  <div class="col-6 col-md-4 col-xl-3">{{ stat('bi-cash-coin', stats.average ~ ' LPA', 'Average package') }}</div>
+  <div class="col-6 col-md-4 col-xl-3">{{ stat('bi-patch-check', stats.verified, 'Verified profiles') }}</div>
+</div>
+<div class="row g-3">
+  <div class="col-md-6 col-xl-4">{{ chart_card('cDept', 'Department-wise placement') }}</div>
+  <div class="col-md-6 col-xl-4">{{ chart_card('cComp', 'Company-wise placement') }}</div>
+  <div class="col-md-6 col-xl-4">{{ chart_card('cStat', 'Application statistics') }}</div>
+  <div class="col-md-6 col-xl-4">{{ chart_card('cTrend', 'Monthly placement trend') }}</div>
+  <div class="col-md-6 col-xl-4">{{ chart_card('cPack', 'Package statistics') }}</div>
+  <div class="col-md-6 col-xl-4">{{ chart_card('cSkill', 'Top student skills') }}</div>
+</div>
+<script>
+  window.addEventListener('load', function () {
+    const C = {{ charts|tojson }};
+    TH.chart('cDept','bar',C.dept.labels,C.dept.data,{label:'Placed',color:'#16a34a'});
+    TH.chart('cComp','bar',C.company.labels,C.company.data,{label:'Placed',color:'#f28a17'});
+    TH.chart('cStat','doughnut',C.status.labels,C.status.data);
+    TH.chart('cTrend','line',C.trend.labels,C.trend.data,{label:'Placements'});
+    TH.chart('cPack','bar',C.package.labels,C.package.data,{label:'Students',color:'#84cc16'});
+    TH.chart('cSkill','bar',C.skills.labels,C.skills.data,{label:'Students',horizontal:true,color:'#0f766e'});
+  });
+</script>

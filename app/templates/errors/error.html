@@ -1,0 +1,12 @@
+{% extends 'base_public.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<section class="band"><div class="container text-center" style="max-width:560px">
+  <div class="display-font" style="font-size:6rem;font-weight:800;color:var(--saffron);line-height:1">{{ code }}</div>
+  <h2 class="mt-2">{{ title }}</h2><p class="text-muted">{{ message }}</p>
+  <div class="d-flex gap-2 justify-content-center mt-4">
+    <a class="btn btn-primary" href="{{ url_for('main.index') }}"><i class="bi bi-house me-1"></i>Go home</a>
+    <a class="btn btn-soft" href="javascript:history.back()">Go back</a>
+  </div>
+</div></section>
+{% endblock %}

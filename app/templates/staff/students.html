@@ -1,0 +1,24 @@
+{% extends 'base_app.html' %}
+{% from '_macros.html' import badge, pagination, empty %}
+{% block title %}Students{% endblock %}
+{% block content %}
+<form class="card mb-3" method="get"><div class="card-body"><div class="row g-2 align-items-end">
+  <div class="col-lg-3"><label class="form-label">Search</label><input class="form-control" name="q" value="{{ request.args.get('q','') }}" placeholder="Name, roll no or email"></div>
+  <div class="col-6 col-lg-2"><label class="form-label">Department</label><select class="form-select" name="department"><option value="">All</option>{% for d in departments %}<option value="{{ d.id }}" {{ 'selected' if request.args.get('department')|string == d.id|string }}>{{ d.name }}</option>{% endfor %}</select></div>
+  <div class="col-6 col-lg-1"><label class="form-label">Min CGPA</label><input class="form-control" type="number" step="0.1" min="0" max="10" name="min_cgpa" value="{{ request.args.get('min_cgpa','') }}"></div>
+  <div class="col-6 col-lg-2"><label class="form-label">Skill</label><input class="form-control" name="skill" value="{{ request.args.get('skill','') }}" placeholder="e.g. Python"></div>
+  <div class="col-6 col-lg-2"><label class="form-label">Profile status</label><select class="form-select" name="verification"><option value="">Any</option>{% for v in ['pending','verified','rejected'] %}<option value="{{ v }}" {{ 'selected' if request.args.get('verification') == v }}>{{ v|title }}</option>{% endfor %}</select></div>
+  <div class="col-lg-2 d-flex gap-2"><button class="btn btn-primary"><i class="bi bi-search me-1"></i>Filter</button><a class="btn btn-soft" href="{{ staff_url('students') }}">Reset</a></div>
+</div></div></form>
+<div class="card">{% if page.items %}<div class="table-responsive"><table class="table table-hover mb-0">
+  <thead><tr><th>Student</th><th>Department</th><th>CGPA</th><th>Top skills</th><th style="min-width:130px">Profile</th><th>Status</th><th></th></tr></thead><tbody>
+  {% for s in page.items %}<tr>
+    <td><a class="fw-semibold text-reset" href="{{ staff_url('student_detail', student_id=s.id) }}">{{ s.name }}</a><div class="small text-muted">{{ s.roll_number }} &middot; {{ s.graduation_year }}</div></td>
+    <td class="small">{{ s.department.name if s.department }}</td><td>{{ s.cgpa if s.cgpa is not none else '-' }}</td>
+    <td>{% for n in s.skill_names[:3] %}<span class="chip">{{ n }}</span>{% endfor %}{% if s.skills|length > 3 %}<span class="small text-muted">+{{ s.skills|length - 3 }}</span>{% endif %}</td>
+    <td><div class="progress"><div class="progress-bar {{ 'bg-green' if s.completion >= 80 else 'bg-accent' }}" style="width:{{ s.completion }}%"></div></div><small class="text-muted">{{ s.completion }}%</small></td>
+    <td>{{ badge(s.verification_status) }}{% if s.is_placed %} <span class="badge badge-soft-success">Placed</span>{% endif %}</td>
+    <td class="text-end"><a class="btn btn-soft btn-sm" href="{{ staff_url('student_detail', student_id=s.id) }}">View</a></td></tr>{% endfor %}
+</tbody></table></div>{% else %}{% call empty('bi-people', 'No students match these filters') %}{% endcall %}{% endif %}</div>
+{{ pagination(page) }}
+{% endblock %}
